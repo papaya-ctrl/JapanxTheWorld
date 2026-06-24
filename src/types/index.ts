@@ -1,0 +1,76 @@
+export type AnalysisSource = "template" | "ai";
+
+export type AnalysisUrgency = "low" | "important" | "urgent";
+
+export type UiStatus = "idle" | "loading" | "success" | "empty" | "error";
+
+export type DocumentAnalysisRequest = {
+  documentText: string;
+  documentTypeHint?: string;
+  sourceLanguageHint?: string;
+};
+
+export type DocumentAnalysisResult = {
+  source: AnalysisSource;
+  documentType: string;
+  summary: string;
+  deadline: string | null;
+  urgency: AnalysisUrgency;
+  importantPoints: string[];
+  nextSteps: string[];
+  relatedGuide: string | null;
+  officialWarning: string;
+};
+
+export type GuideSummary = {
+  id: string;
+  title: string;
+  category: string;
+  summary: string;
+  estimatedReadMinutes: number;
+};
+
+export type GuideDetail = GuideSummary & {
+  audience: string;
+  requiredDocuments: string[];
+  steps: string[];
+  officialResourceIds: string[];
+};
+
+export type OfficialResource = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  url: string;
+};
+
+export type ChecklistItem = {
+  id: string;
+  title: string;
+  completed: boolean;
+  dueDate: string | null;
+  category: string;
+};
+
+export type ChecklistCreateInput = {
+  title: string;
+  dueDate?: string | null;
+  category: string;
+};
+
+export type ChecklistUpdateInput = Partial<ChecklistCreateInput> & {
+  completed?: boolean;
+};
+
+export type ApiError = {
+  code: string;
+  message: string;
+  details?: string[];
+};
+
+export type DocumentInputFormValues = {
+  documentText: string;
+  documentTypeHint?: string;
+  sourceLanguageHint?: string;
+};
