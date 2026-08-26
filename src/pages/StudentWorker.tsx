@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { getResources } from "../api/client";
 import { FeatureCard } from "../components/FeatureCard";
 import { OfficialResourceCard } from "../components/OfficialResourceCard";
-import { mockResources } from "../data/mockResources";
+import type { ApiError, OfficialResource, UiStatus } from "../types";
 
 const timeline = [
   "Prepare your resume, deadlines, and interview schedule early.",
@@ -11,9 +13,42 @@ const timeline = [
 ];
 
 export function StudentWorker() {
-  const relatedResources = mockResources.filter((resource) =>
-    ["isa-main", "hello-work"].includes(resource.id),
-  );
+  const [status, setStatus] = useState<UiStatus>("loading");
+  const [relatedResources, setRelatedResources] = useState<OfficialResource[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    const loadResources = async () => {
+      try {
+        const resources = await getResources();
+        if (!active) {
+          return;
+        }
+        const filteredResources = resources.filter((resource) =>
+          ["isa-main", "hello-work"].includes(resource.id),
+        );
+        setRelatedResources(filteredResources);
+        setStatus(filteredResources.length ? "success" : "empty");
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+        const apiError = error as ApiError;
+        setErrorMessage(
+          apiError.message || "Official support links could not be loaded.",
+        );
+        setStatus("error");
+      }
+    };
+
+    void loadResources();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="space-y-10">
@@ -89,11 +124,41 @@ export function StudentWorker() {
             Open Help Center
           </Link>
         </div>
-        <div className="grid gap-5 md:grid-cols-2">
-          {relatedResources.map((resource) => (
-            <OfficialResourceCard key={resource.id} resource={resource} />
-          ))}
-        </div>
+        {status === "loading" ? (
+          <div className="grid gap-5 md:grid-cols-2" aria-live="polite">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-56 animate-pulse rounded-[28px] bg-white shadow-sm ring-1 ring-slate-200"
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {status === "error" ? (
+          <div role="alert" className="rounded-[28px] border border-red-100 bg-red-50 px-6 py-5">
+            <p className="text-sm font-semibold text-red-700">
+              Support links could not be loaded
+            </p>
+            <p className="mt-2 text-sm text-red-700/90">{errorMessage}</p>
+          </div>
+        ) : null}
+
+        {status === "empty" ? (
+          <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-5">
+            <p className="text-sm font-semibold text-slate-900">
+              No related support links are available yet.
+            </p>
+          </div>
+        ) : null}
+
+        {status === "success" ? (
+          <div className="grid gap-5 md:grid-cols-2">
+            {relatedResources.map((resource) => (
+              <OfficialResourceCard key={resource.id} resource={resource} />
+            ))}
+          </div>
+        ) : null}
       </section>
     </div>
   );

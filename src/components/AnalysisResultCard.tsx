@@ -21,15 +21,25 @@ const formatDeadline = (deadline: string | null) => {
 };
 
 export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
+  const sourceLabel =
+    result.source === "template" ? "Verified Guide" : "AI-assisted Explanation";
+  const sourceHelp =
+    result.source === "template"
+      ? "Based on JapanxTheWorld trusted content"
+      : "Please confirm important details with official sources";
+
   return (
     <article className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
       <div className="border-b border-slate-200 bg-gradient-to-r from-blue-50 via-white to-red-50 px-6 py-6 sm:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                {result.source === "template" ? "Trusted template" : "AI support"}
-              </span>
+              <div className="rounded-2xl bg-slate-900 px-4 py-2 text-white">
+                <p className="text-xs font-semibold uppercase text-white">
+                  {sourceLabel}
+                </p>
+                <p className="mt-1 text-xs text-white/75">{sourceHelp}</p>
+              </div>
               <UrgencyBadge urgency={result.urgency} />
             </div>
             <div>

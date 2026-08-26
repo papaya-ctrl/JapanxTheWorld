@@ -11,10 +11,13 @@ export function DocumentDecoder() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [lastSubmittedValues, setLastSubmittedValues] =
+    useState<DocumentInputFormValues | null>(null);
 
   const handleSubmit = async (values: DocumentInputFormValues) => {
     setIsSubmitting(true);
     setErrorMessage("");
+    setLastSubmittedValues(values);
 
     try {
       const result: DocumentAnalysisResult = await analyzeDocument(values);
@@ -34,6 +37,14 @@ export function DocumentDecoder() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleRetry = async () => {
+    if (!lastSubmittedValues) {
+      return;
+    }
+
+    await handleSubmit(lastSubmittedValues);
   };
 
   return (
@@ -62,6 +73,7 @@ export function DocumentDecoder() {
 
       <DocumentInputForm
         onSubmit={handleSubmit}
+        onRetry={lastSubmittedValues ? handleRetry : undefined}
         isSubmitting={isSubmitting}
         errorMessage={errorMessage}
       />

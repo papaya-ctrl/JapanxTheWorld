@@ -16,11 +16,13 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== "false";
+const MOCK_API_SCENARIO = import.meta.env.VITE_MOCK_API_SCENARIO ?? "success";
+const IS_TEST = import.meta.env.MODE === "test";
 const CHECKLIST_STORAGE_KEY = "japanxtheworld.checklist";
 
 const delay = async (ms = 450) =>
   new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
+    globalThis.setTimeout(resolve, IS_TEST ? 20 : ms);
   });
 
 const createApiError = (
@@ -57,6 +59,78 @@ const writeChecklistStorage = (items: ChecklistItem[]) => {
     window.localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(items));
   }
 };
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === "string");
+
+export const isDocumentAnalysisResult = (
+  value: unknown,
+): value is DocumentAnalysisResult => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    (value.source === "template" || value.source === "ai") &&
+    typeof value.documentType === "string" &&
+    typeof value.summary === "string" &&
+    (typeof value.deadline === "string" || value.deadline === null) &&
+    (value.urgency === "low" ||
+      value.urgency === "important" ||
+      value.urgency === "urgent") &&
+    isStringArray(value.importantPoints) &&
+    isStringArray(value.nextSteps) &&
+    (typeof value.relatedGuide === "string" || value.relatedGuide === null) &&
+    typeof value.officialWarning === "string"
+  );
+};
+
+type MockScenario =
+  | "success"
+  | "trusted-template"
+  | "ai-fallback"
+  | "timeout"
+  | "server-error"
+  | "malformed"
+  | "unknown-document"
+  | "no-deadline"
+  | "empty-guides"
+  | "resources-error"
+  | "checklist-mutation-error";
+
+const scenarioFromRequest = (
+  request?: Pick<DocumentAnalysisRequest, "documentText" | "documentTypeHint">,
+): MockScenario => {
+  const combinedInput =
+    `${request?.documentTypeHint ?? ""} ${request?.documentText ?? ""}`.toLowerCase();
+  const scenarioMatch = combinedInput.match(/simulate:([a-z-]+)/);
+  return (scenarioMatch?.[1] as MockScenario | undefined) ?? MOCK_API_SCENARIO;
+};
+
+const createNoDeadlineResult = (): DocumentAnalysisResult => ({
+  source: "ai",
+  documentType: "Unknown Official Document",
+  summary:
+    "This document appears to be an official notice, but no clear deadline is written in the provided text.",
+  deadline: null,
+  urgency: "important",
+  importantPoints: [
+    "The document may require attention.",
+    "No clear deadline was found.",
+    "The issuing organization should confirm the details.",
+  ],
+  nextSteps: [
+    "Check the sender and contact information.",
+    "Ask the issuing organization whether a deadline applies.",
+    "Keep the document until the procedure is confirmed.",
+  ],
+  relatedGuide: null,
+  officialWarning:
+    "This explanation is only a support tool. Please confirm important details with the issuing organization or an official source.",
+});
 
 const fetchJson = async <T>(
   path: string,
@@ -102,18 +176,74 @@ export const analyzeDocument = async (
         "Please paste document text before starting analysis.",
       );
     }
+
+    const scenario = scenarioFromRequest(request);
+
+    if (scenario === "timeout") {
+      throw createApiError(
+        "ANALYSIS_TIMEOUT",
+        "The analysis took too long. Please try again with clearer text.",
+      );
+    }
+
+    if (scenario === "server-error") {
+      throw createApiError(
+        "REQUEST_FAILED",
+        "Something went wrong while analyzing this document.",
+      );
+    }
+
+    if (scenario === "malformed") {
+      throw createApiError(
+        "MALFORMED_ANALYSIS",
+        "The analysis result could not be displayed safely. Please try again.",
+      );
+    }
+
+    if (scenario === "trusted-template") {
+      return getMockAnalysisResult({
+        ...request,
+        documentText: "住民税納税通知書です。納期限を確認してください。",
+        documentTypeHint: "tax notice",
+      });
+    }
+
+    if (scenario === "ai-fallback" || scenario === "unknown-document") {
+      return getMockAnalysisResult({
+        ...request,
+        documentText: "通知。確認してください。日付や手続き名の一部が読めません。",
+        documentTypeHint: "unknown",
+      });
+    }
+
+    if (scenario === "no-deadline") {
+      return createNoDeadlineResult();
+    }
+
     return getMockAnalysisResult(request);
   }
 
-  return fetchJson<DocumentAnalysisResult>("/documents/analyze", {
+  const result = await fetchJson<unknown>("/documents/analyze", {
     method: "POST",
     body: JSON.stringify(request),
   });
+
+  if (!isDocumentAnalysisResult(result)) {
+    throw createApiError(
+      "MALFORMED_ANALYSIS",
+      "The analysis result could not be displayed safely. Please try again.",
+    );
+  }
+
+  return result;
 };
 
 export const getGuides = async (): Promise<GuideSummary[]> => {
   if (USE_MOCK_API) {
     await delay();
+    if (MOCK_API_SCENARIO === "empty-guides") {
+      return [];
+    }
     return mockGuides;
   }
 
@@ -136,6 +266,12 @@ export const getGuideById = async (guideId: string): Promise<GuideDetail> => {
 export const getResources = async (): Promise<OfficialResource[]> => {
   if (USE_MOCK_API) {
     await delay();
+    if (MOCK_API_SCENARIO === "resources-error") {
+      throw createApiError(
+        "RESOURCES_UNAVAILABLE",
+        "Support links could not be loaded right now.",
+      );
+    }
     return mockResources;
   }
 
@@ -156,6 +292,9 @@ export const createChecklistItem = async (
 ): Promise<ChecklistItem> => {
   if (USE_MOCK_API) {
     await delay(250);
+    if (MOCK_API_SCENARIO === "checklist-mutation-error") {
+      throw createApiError("CHECKLIST_SAVE_FAILED", "Your task could not be saved.");
+    }
     const nextItem: ChecklistItem = {
       id: `task-${Date.now()}`,
       title: input.title.trim(),
@@ -180,6 +319,12 @@ export const updateChecklistItem = async (
 ): Promise<ChecklistItem> => {
   if (USE_MOCK_API) {
     await delay(250);
+    if (MOCK_API_SCENARIO === "checklist-mutation-error") {
+      throw createApiError(
+        "CHECKLIST_UPDATE_FAILED",
+        "This task could not be updated right now.",
+      );
+    }
     const items = readChecklistStorage();
     const currentItem = items.find((item) => item.id === id);
 
@@ -210,6 +355,12 @@ export const deleteChecklistItem = async (
 ): Promise<{ success: true; id: string }> => {
   if (USE_MOCK_API) {
     await delay(250);
+    if (MOCK_API_SCENARIO === "checklist-mutation-error") {
+      throw createApiError(
+        "CHECKLIST_DELETE_FAILED",
+        "This task could not be deleted right now.",
+      );
+    }
     const items = readChecklistStorage();
     writeChecklistStorage(items.filter((item) => item.id !== id));
     return { success: true, id };

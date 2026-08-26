@@ -4,6 +4,7 @@ import type { DocumentInputFormValues } from "../types";
 type DocumentInputFormProps = {
   initialValue?: DocumentInputFormValues;
   onSubmit: (values: DocumentInputFormValues) => Promise<void> | void;
+  onRetry?: () => Promise<void> | void;
   isSubmitting: boolean;
   errorMessage?: string;
 };
@@ -11,6 +12,7 @@ type DocumentInputFormProps = {
 export function DocumentInputForm({
   initialValue,
   onSubmit,
+  onRetry,
   isSubmitting,
   errorMessage,
 }: DocumentInputFormProps) {
@@ -77,23 +79,35 @@ export function DocumentInputForm({
       </div>
 
       <div className="grid gap-5">
-        <label className="grid gap-2">
-          <span className="text-sm font-medium text-slate-800">Document text</span>
+        <div className="grid gap-2">
+          <label htmlFor="documentText" className="text-sm font-medium text-slate-800">
+            Document text
+          </label>
           <textarea
+            id="documentText"
             value={values.documentText}
             onChange={(event) => handleChange("documentText", event.target.value)}
             rows={9}
+            aria-invalid={Boolean(validationError)}
+            aria-describedby={
+              validationError ? "documentText-error" : "documentText-helper"
+            }
             className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
             placeholder="Paste Japanese document text here"
           />
-        </label>
+          <span id="documentText-helper" className="text-xs text-slate-500">
+            Synthetic or copied text works in mock mode. Avoid highly sensitive
+            private details.
+          </span>
+        </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-slate-800">
+          <div className="grid gap-2">
+            <label htmlFor="documentTypeHint" className="text-sm font-medium text-slate-800">
               Document type hint
-            </span>
+            </label>
             <input
+              id="documentTypeHint"
               value={values.documentTypeHint}
               onChange={(event) =>
                 handleChange("documentTypeHint", event.target.value)
@@ -101,13 +115,14 @@ export function DocumentInputForm({
               className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
               placeholder="Example: tax notice"
             />
-          </label>
+          </div>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-slate-800">
+          <div className="grid gap-2">
+            <label htmlFor="sourceLanguageHint" className="text-sm font-medium text-slate-800">
               Source language hint
-            </span>
+            </label>
             <select
+              id="sourceLanguageHint"
               value={values.sourceLanguageHint}
               onChange={(event) =>
                 handleChange("sourceLanguageHint", event.target.value)
@@ -118,21 +133,43 @@ export function DocumentInputForm({
               <option value="en">English</option>
               <option value="mixed">Mixed</option>
             </select>
-          </label>
+          </div>
         </div>
       </div>
 
       {validationError ? (
-        <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p
+          id="documentText-error"
+          role="alert"
+          className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {validationError}
         </p>
       ) : null}
 
       {errorMessage ? (
-        <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {errorMessage}
-        </p>
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="space-y-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <p>{errorMessage}</p>
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              disabled={isSubmitting}
+              className="inline-flex rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Retry analysis
+            </button>
+          ) : null}
+        </div>
       ) : null}
+
+      <div aria-live="polite" className="min-h-6 text-sm font-medium text-blue-700">
+        {isSubmitting ? "Analyzing document..." : ""}
+      </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-5 text-slate-500">
