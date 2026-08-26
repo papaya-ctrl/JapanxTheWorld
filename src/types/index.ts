@@ -22,6 +22,55 @@ export type DocumentAnalysisResult = {
   officialWarning: string;
 };
 
+export type TrustedTopicCategory =
+  | "city-hall"
+  | "immigration"
+  | "tax"
+  | "insurance"
+  | "pension"
+  | "work"
+  | "school";
+
+export type TrustedTopicUser = "student" | "worker" | "job-seeker";
+
+export type TrustedTopic = {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  category: TrustedTopicCategory;
+  targetUsers: TrustedTopicUser[];
+  aliases: string[];
+  keywords: string[];
+  summary: string;
+  importantPoints: string[];
+  nextSteps: string[];
+  requiredDocuments?: string[];
+  warnings?: string[];
+  officialSources: {
+    title: string;
+    url: string;
+    organization: string;
+  }[];
+  lastReviewedAt: string;
+  needsOfficialConfirmation: boolean;
+};
+
+export type TopicClassificationResult = {
+  topicId: string | null;
+  documentTemplateId: string | null;
+  confidence: number;
+  reason?: string;
+};
+
+export type DocumentTemplate = DocumentAnalysisResult & {
+  id: string;
+  matchKeywords: string[];
+  strongMatchKeywords: string[];
+  relatedTopicId: string;
+  trustedSummary: string;
+  defaultUrgency: AnalysisUrgency;
+};
+
 export type GuideSummary = {
   id: string;
   title: string;
