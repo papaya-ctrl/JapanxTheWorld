@@ -136,12 +136,17 @@ const fetchJson = async <T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> => {
+  const headers =
+    init?.body instanceof FormData
+      ? init?.headers
+      : {
+          "Content-Type": "application/json",
+          ...(init?.headers ?? {}),
+        };
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
     ...init,
+    headers,
   });
 
   if (!response.ok) {
@@ -165,19 +170,62 @@ const fetchJson = async <T>(
   return (await response.json()) as T;
 };
 
+const hasAnalyzeInput = (request: DocumentAnalysisRequest) =>
+  Boolean(request.documentText?.trim()) || Boolean(request.documentFile);
+
+const createMockFileText = (request: DocumentAnalysisRequest) => {
+  if (request.documentText?.trim()) {
+    return request.documentText;
+  }
+
+  const fileName = request.documentFile?.name ?? "uploaded document";
+  return `Mock file analysis for ${fileName}. OCR is not active in mock mode.`;
+};
+
+const createAnalyzeRequestBody = (request: DocumentAnalysisRequest) => {
+  if (!request.documentFile) {
+    return JSON.stringify({
+      documentText: request.documentText ?? "",
+      documentTypeHint: request.documentTypeHint,
+      sourceLanguageHint: request.sourceLanguageHint,
+    });
+  }
+
+  const formData = new FormData();
+  formData.append("file", request.documentFile.file, request.documentFile.name);
+
+  if (request.documentText?.trim()) {
+    formData.append("documentText", request.documentText.trim());
+  }
+
+  if (request.documentTypeHint) {
+    formData.append("documentTypeHint", request.documentTypeHint);
+  }
+
+  if (request.sourceLanguageHint) {
+    formData.append("sourceLanguageHint", request.sourceLanguageHint);
+  }
+
+  return formData;
+};
+
 export const analyzeDocument = async (
   request: DocumentAnalysisRequest,
 ): Promise<DocumentAnalysisResult> => {
   if (USE_MOCK_API) {
     await delay(900);
-    if (!request.documentText.trim()) {
+    if (!hasAnalyzeInput(request)) {
       throw createApiError(
         "EMPTY_DOCUMENT",
-        "Please paste document text before starting analysis.",
+        "Please paste document text or choose a supported document file.",
       );
     }
 
-    const scenario = scenarioFromRequest(request);
+    const mockRequest: DocumentAnalysisRequest = {
+      ...request,
+      documentText: createMockFileText(request),
+    };
+    const scenario = scenarioFromRequest(mockRequest);
 
     if (scenario === "timeout") {
       throw createApiError(
@@ -202,7 +250,7 @@ export const analyzeDocument = async (
 
     if (scenario === "trusted-template") {
       return getMockAnalysisResult({
-        ...request,
+        ...mockRequest,
         documentText: "住民税納税通知書です。納期限を確認してください。",
         documentTypeHint: "tax notice",
       });
@@ -210,7 +258,7 @@ export const analyzeDocument = async (
 
     if (scenario === "ai-fallback" || scenario === "unknown-document") {
       return getMockAnalysisResult({
-        ...request,
+        ...mockRequest,
         documentText: "通知。確認してください。日付や手続き名の一部が読めません。",
         documentTypeHint: "unknown",
       });
@@ -220,12 +268,19 @@ export const analyzeDocument = async (
       return createNoDeadlineResult();
     }
 
-    return getMockAnalysisResult(request);
+    return getMockAnalysisResult(mockRequest);
+  }
+
+  if (!hasAnalyzeInput(request)) {
+    throw createApiError(
+      "EMPTY_DOCUMENT",
+      "Please paste document text or choose a supported document file.",
+    );
   }
 
   const result = await fetchJson<unknown>("/documents/analyze", {
     method: "POST",
-    body: JSON.stringify(request),
+    body: createAnalyzeRequestBody(request),
   });
 
   if (!isDocumentAnalysisResult(result)) {

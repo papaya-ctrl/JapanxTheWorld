@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { darkPrimaryCtaClass } from "./ctaStyles";
 
 type FeatureCardProps = {
   title: string;
@@ -31,7 +32,7 @@ export function FeatureCard({
         </div>
         <Link
           to={ctaTo}
-          className="inline-flex w-fit items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600"
+          className={`${darkPrimaryCtaClass} w-fit items-center`}
         >
           {ctaLabel}
         </Link>

@@ -153,7 +153,7 @@ export function ChecklistItem({
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:bg-blue-300 disabled:text-white"
               >
                 {isSaving ? "Saving..." : "Save"}
               </button>

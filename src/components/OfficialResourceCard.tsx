@@ -1,4 +1,5 @@
 import type { OfficialResource } from "../types";
+import { darkPrimaryCtaClass } from "./ctaStyles";
 
 type OfficialResourceCardProps = {
   resource: OfficialResource;
@@ -22,7 +23,7 @@ export function OfficialResourceCard({ resource }: OfficialResourceCardProps) {
           href={resource.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600"
+          className={darkPrimaryCtaClass}
         >
           Open official website
         </a>

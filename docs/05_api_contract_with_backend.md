@@ -20,8 +20,16 @@ export type ApiError = {
   details?: string[];
 };
 
+export type DocumentFileInput = {
+  file: File;
+  name: string;
+  type: string;
+  size: number;
+};
+
 export type DocumentAnalysisRequest = {
-  documentText: string;
+  documentText?: string;
+  documentFile?: DocumentFileInput;
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };
@@ -98,14 +106,25 @@ export type ChecklistUpdateInput = Partial<ChecklistCreateInput> & {
 
 | Item | Spec |
 | --- | --- |
-| Purpose | Analyze user-provided document text and return a shared result shape |
+| Purpose | Analyze user-provided document text, uploaded photo/image, or PDF and return a shared result shape |
 | Request type | `DocumentAnalysisRequest` |
 | Success type | `DocumentAnalysisResult` |
 | Loading state | Disable submit, show spinner and “Analyzing document...” |
 | Success state | Navigate to result page and render returned object |
 | Error state | Show retry block and keep previous input visible |
 
-#### Example request
+#### Request input rules
+
+| Rule | Requirement |
+| --- | --- |
+| Minimum input | At least one of `documentText` or `documentFile` is required |
+| Text-only request | Send JSON with `documentText`, `documentTypeHint`, and `sourceLanguageHint` |
+| File request | Send `multipart/form-data` with `file` plus optional `documentText`, `documentTypeHint`, and `sourceLanguageHint` |
+| Supported file types | `image/jpeg`, `image/png`, `image/webp`, `application/pdf` |
+| Frontend max size | 10 MB |
+| OCR ownership | Backend owns OCR/file extraction and should return `UNREADABLE_DOCUMENT` when text cannot be extracted safely |
+
+#### Example text-only request
 
 ```json
 {
@@ -113,6 +132,17 @@ export type ChecklistUpdateInput = Partial<ChecklistCreateInput> & {
   "documentTypeHint": "tax notice",
   "sourceLanguageHint": "ja"
 }
+```
+
+#### Example file request fields
+
+```txt
+Content-Type: multipart/form-data
+
+file: residence-tax-notice.pdf
+documentText: optional pasted text
+documentTypeHint: tax notice
+sourceLanguageHint: ja
 ```
 
 #### Example success

@@ -39,12 +39,12 @@ export function DocumentResult() {
           Start with a document first
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
-          The result page needs a completed document analysis. Paste document text
-          on the decoder page and then come back here.
+          The result page needs a completed document analysis. Upload a supported
+          file or paste document text on the decoder page and then come back here.
         </p>
         <Link
           to="/document-decoder"
-          className="mt-6 inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="mt-6 inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
           Open Document Decoder
         </Link>

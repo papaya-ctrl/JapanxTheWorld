@@ -27,14 +27,33 @@ The backend owns this router implementation. The frontend only expects a valid `
 ## 2. Frontend Request Shape
 
 ```ts
+export type DocumentFileInput = {
+  file: File;
+  name: string;
+  type: string;
+  size: number;
+};
+
 export type DocumentAnalysisRequest = {
-  documentText: string;
+  documentText?: string;
+  documentFile?: DocumentFileInput;
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };
 ```
 
-### Example request
+### Input rules
+
+| Rule | Requirement |
+| --- | --- |
+| Minimum input | Accept either pasted text, one uploaded file, or both |
+| Empty input | Return `400` with `ApiError.code = "EMPTY_DOCUMENT"` |
+| Supported upload types | JPEG, PNG, WebP, and PDF |
+| Frontend upload limit | 10 MB |
+| Mock-mode behavior | Frontend can submit selected files for UI testing, but no OCR is performed |
+| Production file behavior | Backend extracts readable text from the uploaded file before classification |
+
+### Example text-only request
 
 ```json
 {
@@ -43,6 +62,28 @@ export type DocumentAnalysisRequest = {
   "sourceLanguageHint": "ja"
 }
 ```
+
+### Example file request
+
+```txt
+POST /api/documents/analyze
+Content-Type: multipart/form-data
+
+file: kokumin-kenko-hoken-notice.webp
+documentText: optional pasted text that should be analyzed together with the file
+documentTypeHint: insurance notice
+sourceLanguageHint: ja
+```
+
+### Backend file/OCR expectations
+
+| Case | Backend action |
+| --- | --- |
+| Image/PDF has readable text | Extract text, classify document/topic, then return `DocumentAnalysisResult` |
+| Image/PDF cannot be read | Return `422` with `ApiError.code = "UNREADABLE_DOCUMENT"` |
+| File type is unsupported | Return `415` or `422` with `ApiError.code = "UNSUPPORTED_FILE_TYPE"` |
+| File is too large | Return `413` with `ApiError.code = "FILE_TOO_LARGE"` |
+| Text and file are both provided | Prefer combined analysis; do not ignore pasted text |
 
 ## 3. Required Response Shape
 
@@ -129,6 +170,8 @@ Avoid exact string matching such as one hardcoded sentence. User input and docum
 | Failure | Preferred backend response |
 | --- | --- |
 | Empty input | `400` with `ApiError.code = "EMPTY_DOCUMENT"` |
+| Unsupported file type | `415` or `422` with `ApiError.code = "UNSUPPORTED_FILE_TYPE"` |
+| File too large | `413` with `ApiError.code = "FILE_TOO_LARGE"` |
 | Unsupported file or unreadable text | `422` with `ApiError.code = "UNREADABLE_DOCUMENT"` |
 | AI provider timeout | `504` with `ApiError.code = "ANALYSIS_TIMEOUT"` |
 | AI provider unavailable | `503` with `ApiError.code = "ANALYSIS_UNAVAILABLE"` |

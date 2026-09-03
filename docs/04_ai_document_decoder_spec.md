@@ -122,11 +122,19 @@ export type DocumentAnalysisResult = {
 };
 
 export type DocumentAnalysisRequest = {
-  documentText: string;
+  documentText?: string;
+  documentFile?: {
+    file: File;
+    name: string;
+    type: string;
+    size: number;
+  };
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };
 ```
+
+`DocumentAnalysisRequest` accepts pasted text, one supported uploaded file, or both. At least one of `documentText` or `documentFile` is required. The frontend can test selected files in mock mode, but OCR and production file extraction are backend-owned.
 
 ## 8. Mock Result Examples
 
@@ -198,8 +206,9 @@ export type DocumentAnalysisRequest = {
 | API timeout | Show retry message and keep user input if possible |
 | Invalid JSON | Show generic analysis error and log for debugging |
 | Missing required fields | Treat response as invalid and show fallback error |
-| Unreadable text | Show message asking the user to paste clearer text or retry |
-| Unsupported file in v1 | Show file limitation note and keep text input as primary path |
+| Unreadable text or file | Show message asking the user to paste clearer text or retry with a better image/PDF |
+| Unsupported file type | Show inline validation before submit when possible; backend should also reject safely |
+| Oversized file | Show inline validation before submit |
 
 ## 11. Privacy Warning Text
 

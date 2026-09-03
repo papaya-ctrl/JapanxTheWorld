@@ -69,21 +69,23 @@ export const mockAnalysisResults: DocumentAnalysisResult[] = [
 export const getMockAnalysisResult = (
   request: DocumentAnalysisRequest,
 ): DocumentAnalysisResult => {
-  const text = request.documentText.toLowerCase();
+  const text = (request.documentText ?? "").toLowerCase();
   const hint = request.documentTypeHint?.toLowerCase() ?? "";
+  const fileName = request.documentFile?.name.toLowerCase() ?? "";
+  const combinedInput = `${text} ${hint} ${fileName}`;
 
   if (
-    text.includes("residence tax") ||
-    text.includes("住民税") ||
-    hint.includes("tax")
+    combinedInput.includes("residence tax") ||
+    combinedInput.includes("住民税") ||
+    combinedInput.includes("tax")
   ) {
     return mockAnalysisResults[0];
   }
 
   if (
-    text.includes("insurance") ||
-    text.includes("保険") ||
-    hint.includes("insurance")
+    combinedInput.includes("insurance") ||
+    combinedInput.includes("保険") ||
+    combinedInput.includes("insurance")
   ) {
     return mockAnalysisResults[1];
   }

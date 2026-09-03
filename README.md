@@ -46,6 +46,8 @@ AI supports classification, fact extraction, and fallback explanations. Known pr
 
 The frontend is mock-first and backend-ready. Pages call `src/api/client.ts`, which can return local mock data or call backend endpoints depending on environment variables. The frontend-facing `DocumentAnalysisResult` shape stays the same for trusted template results and AI fallback results.
 
+The Document Decoder accepts pasted text, JPEG/PNG/WebP images, or PDFs in the frontend prototype. In mock mode, uploaded files let the UI flow be tested, but no OCR or real document reading happens yet. Real file extraction and OCR remain backend-owned.
+
 ## Project Structure
 
 ```txt
@@ -147,7 +149,7 @@ JapanxTheWorld is a support tool. AI output and trusted guidance do not replace 
 - Backend implements real `POST /api/documents/analyze`
 - Backend implements real Life Guides, Official Resources, and Checklist APIs
 - Backend adds authentication if needed
-- Backend connects OCR/file handling and real AI provider logic
+- Backend connects OCR/file handling, multipart document upload, and real AI provider logic
 - Frontend switches `VITE_USE_MOCK_API=false` after APIs are ready
 - Full end-to-end QA after backend integration
 

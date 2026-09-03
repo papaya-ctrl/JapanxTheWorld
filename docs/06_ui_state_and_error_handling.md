@@ -41,7 +41,9 @@ type UiStatus = "idle" | "loading" | "success" | "empty" | "error";
 
 | Input area | Validation rule | Failure UI |
 | --- | --- | --- |
-| Document text | Required unless supported upload flow exists | Inline message below textarea |
+| Document text / file | At least one of pasted text or supported file is required | Inline message below decoder inputs |
+| Document upload type | Must be JPEG, PNG, WebP, or PDF | Inline message below decoder inputs |
+| Document upload size | Must be greater than 0 bytes and no larger than 10 MB | Inline message below decoder inputs |
 | Document type hint | Optional | No blocking error |
 | Checklist title | Required | Inline form error |
 | Checklist due date | Optional but must be a valid date if entered | Inline form error |
@@ -113,7 +115,10 @@ type UiStatus = "idle" | "loading" | "success" | "empty" | "error";
 | Scenario | Suggested copy |
 | --- | --- |
 | Generic request failure | “Something went wrong while loading this information. Please try again.” |
-| Decoder validation | “Please paste document text before starting analysis.” |
+| Decoder validation | “Please paste document text or choose a supported document file.” |
+| Unsupported decoder file | “Please upload a JPEG, PNG, WebP, or PDF file.” |
+| Empty decoder file | “This file is empty. Please choose another file.” |
+| Oversized decoder file | “Please choose a file smaller than 10 MB.” |
 | Invalid result format | “The analysis result could not be displayed safely. Please try again.” |
 | Checklist save failure | “Your task could not be saved. Please try again.” |
 | Checklist delete failure | “This task could not be deleted right now. Please try again.” |

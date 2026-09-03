@@ -4,8 +4,16 @@ export type AnalysisUrgency = "low" | "important" | "urgent";
 
 export type UiStatus = "idle" | "loading" | "success" | "empty" | "error";
 
+export type DocumentFileInput = {
+  file: File;
+  name: string;
+  type: string;
+  size: number;
+};
+
 export type DocumentAnalysisRequest = {
-  documentText: string;
+  documentText?: string;
+  documentFile?: DocumentFileInput;
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };
@@ -33,6 +41,8 @@ export type TrustedTopicCategory =
 
 export type TrustedTopicUser = "student" | "worker" | "job-seeker";
 
+export type TrustedTopicContentStatus = "verified" | "needs-review" | "dynamic";
+
 export type TrustedTopic = {
   id: string;
   title: string;
@@ -53,6 +63,7 @@ export type TrustedTopic = {
   }[];
   lastReviewedAt: string;
   needsOfficialConfirmation: boolean;
+  contentStatus?: TrustedTopicContentStatus;
 };
 
 export type TopicClassificationResult = {
@@ -120,6 +131,7 @@ export type ApiError = {
 
 export type DocumentInputFormValues = {
   documentText: string;
+  documentFile?: DocumentFileInput;
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };

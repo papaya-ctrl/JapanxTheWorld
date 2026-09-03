@@ -141,6 +141,12 @@ type FeatureCardProps = {
 
 type DocumentInputFormValues = {
   documentText: string;
+  documentFile?: {
+    file: File;
+    name: string;
+    type: string;
+    size: number;
+  };
   documentTypeHint?: string;
   sourceLanguageHint?: string;
 };

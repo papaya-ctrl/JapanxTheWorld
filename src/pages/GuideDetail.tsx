@@ -71,7 +71,7 @@ export function GuideDetail() {
         <p className="mt-2 text-sm leading-6 text-slate-600">{errorMessage}</p>
         <Link
           to="/life-guides"
-          className="mt-6 inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="mt-6 inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
           Back to guides
         </Link>

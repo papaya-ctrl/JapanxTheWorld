@@ -215,7 +215,7 @@ export function Dashboard() {
             <button
               type="submit"
               disabled={isCreating}
-              className="inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+              className="inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:bg-blue-300 disabled:text-white"
             >
               {isCreating ? "Saving..." : "Add checklist item"}
             </button>

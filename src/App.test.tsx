@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, beforeEach } from "vitest";
@@ -46,7 +46,7 @@ describe("JapanxTheWorld app", () => {
     await user.click(screen.getByRole("button", { name: "Analyze document" }));
 
     expect(
-      screen.getByText("Please paste document text before starting analysis."),
+      screen.getByText("Please paste document text or choose a supported document file."),
     ).toBeInTheDocument();
   });
 
@@ -136,6 +136,149 @@ describe("JapanxTheWorld app", () => {
 
     expect(menuButton).toHaveAttribute("aria-expanded", "true");
     expect(screen.getAllByRole("link", { name: "Dashboard" }).length).toBeGreaterThan(0);
+  });
+
+  it("uses explicit readable text color on primary feature buttons", () => {
+    renderRoute("/");
+
+    expect(screen.getByRole("link", { name: "Open decoder" })).toHaveClass(
+      "text-white",
+      "hover:text-white",
+      "hover:bg-blue-700",
+      "focus-visible:ring-2",
+      "focus-visible:ring-blue-500",
+    );
+  });
+});
+
+describe("Document decoder upload flow", () => {
+  it("supports text-only document submission", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Document text" }),
+      "国民健康保険料のお知らせです。2026年8月10日までにお支払いください。",
+    );
+    await user.click(screen.getByRole("button", { name: "Analyze document" }));
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "National Health Insurance Payment Notice",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows selected image file details", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    const imageFile = new File(["synthetic image"], "health-insurance.webp", {
+      type: "image/webp",
+    });
+    await user.upload(
+      screen.getByLabelText("Upload Photo / Document"),
+      imageFile,
+    );
+
+    expect(screen.getByText("health-insurance.webp")).toBeInTheDocument();
+    expect(screen.getByText(/image\/webp/)).toBeInTheDocument();
+    expect(screen.getByAltText("Selected document preview")).toBeInTheDocument();
+  });
+
+  it("shows selected PDF file details", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    const pdfFile = new File(["synthetic pdf"], "residence-tax.pdf", {
+      type: "application/pdf",
+    });
+    await user.upload(
+      screen.getByLabelText("Upload Photo / Document"),
+      pdfFile,
+    );
+
+    expect(screen.getByText("residence-tax.pdf")).toBeInTheDocument();
+    expect(screen.getByText(/application\/pdf/)).toBeInTheDocument();
+    expect(screen.getByText("PDF")).toBeInTheDocument();
+  });
+
+  it("rejects unsupported file types", async () => {
+    renderRoute("/document-decoder");
+
+    const textFile = new File(["not supported"], "memo.txt", {
+      type: "text/plain",
+    });
+    fireEvent.change(
+      screen.getByLabelText("Upload Photo / Document"),
+      {
+        target: {
+          files: [textFile],
+        },
+      },
+    );
+
+    expect(
+      screen.getByText("Please upload a JPEG, PNG, WebP, or PDF file."),
+    ).toBeInTheDocument();
+  });
+
+  it("rejects oversized files", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    const largePdf = new File(
+      [new Uint8Array(10 * 1024 * 1024 + 1)],
+      "large-document.pdf",
+      { type: "application/pdf" },
+    );
+    await user.upload(
+      screen.getByLabelText("Upload Photo / Document"),
+      largePdf,
+    );
+
+    expect(
+      screen.getByText("Please choose a file smaller than 10 MB."),
+    ).toBeInTheDocument();
+  });
+
+  it("removes a selected file", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    const pdfFile = new File(["synthetic pdf"], "remove-me.pdf", {
+      type: "application/pdf",
+    });
+    await user.upload(
+      screen.getByLabelText("Upload Photo / Document"),
+      pdfFile,
+    );
+    await user.click(screen.getByRole("button", { name: "Remove file" }));
+
+    expect(screen.queryByText("remove-me.pdf")).not.toBeInTheDocument();
+    expect(screen.getByText("Choose a file or drag it here")).toBeInTheDocument();
+  });
+
+  it("allows valid file-only mock analysis", async () => {
+    const user = userEvent.setup();
+    renderRoute("/document-decoder");
+
+    const pdfFile = new File(["synthetic pdf"], "residence-tax.pdf", {
+      type: "application/pdf",
+    });
+    await user.upload(
+      screen.getByLabelText("Upload Photo / Document"),
+      pdfFile,
+    );
+
+    const analyzeButton = screen.getByRole("button", { name: "Analyze document" });
+    expect(analyzeButton).toBeEnabled();
+    await user.click(analyzeButton);
+
+    expect(screen.getByText("Analyzing document...")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Residence Tax Notice" }),
+    ).toBeInTheDocument();
   });
 });
 

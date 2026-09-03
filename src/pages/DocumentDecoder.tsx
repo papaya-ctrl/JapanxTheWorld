@@ -58,9 +58,9 @@ export function DocumentDecoder() {
             Understand a Japanese document step by step
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-slate-600">
-            Paste document text to receive a structured explanation in simple
-            English. The result will show the summary, urgency, important points,
-            and practical next steps.
+            Upload a photo, PDF, or paste document text to receive a structured
+            explanation in simple English. The result will show the summary,
+            urgency, important points, and practical next steps.
           </p>
         </div>
         <div className="rounded-[28px] border border-red-100 bg-red-50 p-5">

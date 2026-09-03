@@ -5,7 +5,7 @@ const featureCards = [
   {
     title: "Document Decoder",
     description:
-      "Paste Japanese document text and receive a simple English explanation, clear points, and next steps.",
+      "Upload a Japanese document or paste text and receive a simple English explanation, clear points, and next steps.",
     ctaLabel: "Open decoder",
     ctaTo: "/document-decoder",
     accent: "blue" as const,
