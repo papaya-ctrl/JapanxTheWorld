@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { aiTestCases } from "./aiTestCases";
 import { documentTemplates } from "./documentTemplates";
+import { getMockAnalysisResult, mockAnalysisResults } from "./mockAnalysis";
+import { calculateEstimatedReadMinutes, mockGuideDetails } from "./mockGuides";
 import { trustedTopicsById, trustedTopics } from "./trustedTopics";
 
 const manualTrustedContentV1TopicIds = [
@@ -12,6 +14,19 @@ const manualTrustedContentV1TopicIds = [
   "student-to-worker-transition",
   "part-time-work-permission",
   "employment-working-conditions",
+];
+
+const requiredGuideSectionIds = [
+  "what-this-is",
+  "who-this-is-for",
+  "why-this-matters",
+  "what-to-check-first",
+  "required-documents",
+  "step-by-step-actions",
+  "common-mistakes",
+  "example-situation",
+  "important-warning",
+  "official-confirmation",
 ];
 
 describe("trusted knowledge data", () => {
@@ -52,6 +67,71 @@ describe("trusted knowledge data", () => {
       expect(topic.officialSources.length).toBeGreaterThanOrEqual(1);
       expect(topic.contentStatus).toBe("dynamic");
     }
+  });
+
+  it("expands Manual Trusted Content V1 topics into structured Life Guides", () => {
+    expect(mockGuideDetails).toHaveLength(8);
+    expect(mockGuideDetails.map((guide) => guide.topicId)).toEqual(
+      manualTrustedContentV1TopicIds,
+    );
+
+    for (const guide of mockGuideDetails) {
+      const sectionIds = guide.sections.map((section) => section.id);
+      const trustedTopic = trustedTopicsById[guide.topicId ?? ""];
+
+      expect(sectionIds).toEqual(requiredGuideSectionIds);
+      expect(guide.sections.every((section) => section.body || section.items?.length)).toBe(
+        true,
+      );
+      expect(guide.summary).toBe(trustedTopic.summary);
+      expect(guide.requiredDocuments).toEqual(trustedTopic.requiredDocuments);
+      expect(guide.steps).toEqual(trustedTopic.nextSteps);
+      expect(guide.officialSources).toEqual(trustedTopic.officialSources);
+      expect(guide.needsOfficialConfirmation).toBe(true);
+      expect(guide.contentStatus).toBe("dynamic");
+    }
+  });
+
+  it("calculates guide reading time from visible guide text", () => {
+    for (const guide of mockGuideDetails) {
+      const { estimatedReadMinutes, ...guideWithoutReadTime } = guide;
+
+      expect(estimatedReadMinutes).toBeGreaterThanOrEqual(1);
+      expect(estimatedReadMinutes).toBe(
+        calculateEstimatedReadMinutes(guideWithoutReadTime),
+      );
+    }
+  });
+
+  it("keeps trusted mock analysis results rich without changing the result contract", () => {
+    const trustedResults = mockAnalysisResults.filter((result) => result.source === "template");
+
+    expect(trustedResults.length).toBeGreaterThanOrEqual(2);
+
+    for (const result of trustedResults) {
+      expect(result.summary.split(". ").length).toBeGreaterThanOrEqual(2);
+      expect(result.importantPoints.length).toBeGreaterThanOrEqual(4);
+      expect(result.nextSteps.length).toBeGreaterThanOrEqual(4);
+      expect(result.officialWarning.length).toBeGreaterThan(120);
+    }
+  });
+
+  it("does not invent file-only mock OCR details", () => {
+    const result = getMockAnalysisResult({
+      documentFile: {
+        file: new File(["synthetic pdf"], "residence-tax.pdf", {
+          type: "application/pdf",
+        }),
+        name: "residence-tax.pdf",
+        type: "application/pdf",
+        size: 13,
+      },
+    });
+
+    expect(result.documentType).toBe("Residence Tax Notice");
+    expect(result.deadline).toBeNull();
+    expect(result.summary).toContain("not read with OCR");
+    expect(result.importantPoints.join(" ")).toContain("did not perform OCR");
   });
 
   it("keeps AI test cases synthetic and broad enough for backend evaluation", () => {

@@ -65,6 +65,7 @@ describe("JapanxTheWorld app", () => {
     expect(
       screen.getByText("Based on JapanxTheWorld trusted content"),
     ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Important Points" })).toBeInTheDocument();
   });
 
   it("renders Life Guide cards", async () => {
@@ -72,9 +73,11 @@ describe("JapanxTheWorld app", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "Address Registration After Moving",
+        name: "Address Registration / Moving",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "National Pension" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Part-Time Work Permission" })).toBeInTheDocument();
   });
 
   it("renders guide detail", async () => {
@@ -82,10 +85,22 @@ describe("JapanxTheWorld app", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "Address Registration After Moving",
+        name: "Address Registration / Moving",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByText("住所変更・転入・転出")).toBeInTheDocument();
+    expect(screen.getByText("What this is")).toBeInTheDocument();
+    expect(screen.getByText("Why this matters / why you may receive it")).toBeInTheDocument();
     expect(screen.getByText("Required documents")).toBeInTheDocument();
+    expect(screen.getByText("Common mistakes")).toBeInTheDocument();
+    expect(screen.getByText("Example situation")).toBeInTheDocument();
+    expect(screen.getByText("Official confirmation / source section")).toBeInTheDocument();
+    expect(screen.getByText("Official confirmation needed")).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "Important rule" })).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "Time-sensitive" })).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "Recommended next action" })).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "Official confirmation" })).toBeInTheDocument();
+    expect(screen.getByText("Start here")).toBeInTheDocument();
   });
 
   it("renders dashboard checklist and can toggle an item", async () => {
@@ -164,7 +179,7 @@ describe("Document decoder upload flow", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "National Health Insurance Payment Notice",
+        name: "National Health Insurance Notice",
       }),
     ).toBeInTheDocument();
   });
@@ -279,6 +294,8 @@ describe("Document decoder upload flow", () => {
     expect(
       await screen.findByRole("heading", { name: "Residence Tax Notice" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("No clear deadline detected")).toBeInTheDocument();
+    expect(screen.getByText(/not read with OCR/)).toBeInTheDocument();
   });
 });
 
@@ -315,8 +332,9 @@ describe("Document result rendering", () => {
 
     expect(screen.getByText("AI-assisted Explanation")).toBeInTheDocument();
     expect(
-      screen.getByText("No clear deadline was found in this result."),
+      screen.getByText("No clear deadline detected"),
     ).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "Official confirmation warning" })).toBeInTheDocument();
   });
 
   it("renders urgency badges correctly", () => {
@@ -337,7 +355,7 @@ describe("Document result rendering", () => {
 
     renderRoute("/document-decoder/result");
 
-    expect(screen.getByText("Urgent")).toBeInTheDocument();
+    expect(screen.getByText("Status: Urgent")).toBeInTheDocument();
   });
 });
 

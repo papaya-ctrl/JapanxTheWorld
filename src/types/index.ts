@@ -90,10 +90,34 @@ export type GuideSummary = {
   estimatedReadMinutes: number;
 };
 
+export type GuideOfficialSource = {
+  title: string;
+  organization: string;
+  url: string;
+};
+
+export type GuideSection = {
+  id: string;
+  title: string;
+  body?: string;
+  items?: string[];
+  variant?: "default" | "warning" | "confirmation";
+};
+
 export type GuideDetail = GuideSummary & {
+  topicId?: string;
+  japaneseTitle?: string;
+  contentStatus?: TrustedTopicContentStatus;
+  needsOfficialConfirmation?: boolean;
+  lastReviewedAt?: string;
   audience: string;
   requiredDocuments: string[];
   steps: string[];
+  sections: GuideSection[];
+  commonMistakes?: string[];
+  exampleSituation?: string;
+  importantWarning?: string;
+  officialSources?: GuideOfficialSource[];
   officialResourceIds: string[];
 };
 

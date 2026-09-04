@@ -54,10 +54,34 @@ export type GuideSummary = {
   estimatedReadMinutes: number;
 };
 
+export type GuideOfficialSource = {
+  title: string;
+  organization: string;
+  url: string;
+};
+
+export type GuideSection = {
+  id: string;
+  title: string;
+  body?: string;
+  items?: string[];
+  variant?: "default" | "warning" | "confirmation";
+};
+
 export type GuideDetail = GuideSummary & {
+  topicId?: string;
+  japaneseTitle?: string;
+  contentStatus?: "verified" | "needs-review" | "dynamic";
+  needsOfficialConfirmation?: boolean;
+  lastReviewedAt?: string;
   audience: string;
   requiredDocuments: string[];
   steps: string[];
+  sections: GuideSection[];
+  commonMistakes?: string[];
+  exampleSituation?: string;
+  importantWarning?: string;
+  officialSources?: GuideOfficialSource[];
   officialResourceIds: string[];
 };
 
@@ -180,16 +204,18 @@ sourceLanguageHint: ja
 | Success state | Show guide card grid |
 | Error state | Show banner with retry action |
 
+`estimatedReadMinutes` should be calculated from the visible guide text using a consistent words-per-minute estimate, with a minimum of 1 minute. Do not store arbitrary hand-picked reading-time values.
+
 #### Example success
 
 ```json
 [
   {
     "id": "moving-address-registration",
-    "title": "Address Registration After Moving",
+    "title": "Address Registration / Moving",
     "category": "City Hall",
-    "summary": "What to do after moving to a new address in Japan.",
-    "estimatedReadMinutes": 5
+    "summary": "Address registration is the city or ward office procedure for recording where you live in Japan.",
+    "estimatedReadMinutes": 2
   }
 ]
 ```
@@ -205,16 +231,23 @@ sourceLanguageHint: ja
 | Success state | Render guide details and linked resources |
 | Error state | Show not-found or fetch error block |
 
+Structured guide sections should be returned in `sections` instead of combining the guide into one long paragraph. Manual Trusted Content V1 guides should include sections for what the topic is, who it is for, why it matters, what to check first, required documents, step-by-step actions, common mistakes, an example situation, important warnings, and official confirmation or source information.
+
 #### Example success
 
 ```json
 {
   "id": "moving-address-registration",
-  "title": "Address Registration After Moving",
+  "topicId": "address-registration-moving",
+  "title": "Address Registration / Moving",
+  "japaneseTitle": "住所変更・転入・転出",
   "category": "City Hall",
-  "summary": "What to do after moving to a new address in Japan.",
-  "estimatedReadMinutes": 5,
-  "audience": "Students and workers who changed residence",
+  "summary": "Address registration is the city or ward office procedure for recording where you live in Japan.",
+  "estimatedReadMinutes": 2,
+  "contentStatus": "dynamic",
+  "needsOfficialConfirmation": true,
+  "lastReviewedAt": "2026-09-03",
+  "audience": "Students and workers who moved or will move in Japan.",
   "requiredDocuments": [
     "Residence card",
     "My Number card if available"
@@ -223,6 +256,31 @@ sourceLanguageHint: ja
     "Visit your city office soon after moving.",
     "Bring your residence card and related documents.",
     "Complete the address registration form."
+  ],
+  "sections": [
+    {
+      "id": "what-this-is",
+      "title": "What this is",
+      "body": "Address registration records where you live in Japan."
+    },
+    {
+      "id": "official-confirmation",
+      "title": "Official confirmation / source section",
+      "body": "Confirm the final answer with your city or ward office.",
+      "variant": "confirmation"
+    }
+  ],
+  "commonMistakes": [
+    "Using another municipality's checklist as the final rule."
+  ],
+  "exampleSituation": "You move to a new ward and receive a notice about 転入.",
+  "importantWarning": "Do not rely on another city's instructions as the final answer for your municipality.",
+  "officialSources": [
+    {
+      "title": "Residence Registration / Moving",
+      "organization": "City of Sendai",
+      "url": "https://www.city.sendai.jp/koryu/foreignlanguage/en/information/living-05.html"
+    }
   ],
   "officialResourceIds": [
     "city-hall-moving-guide"

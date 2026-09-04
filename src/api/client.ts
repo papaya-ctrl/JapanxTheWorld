@@ -173,15 +173,6 @@ const fetchJson = async <T>(
 const hasAnalyzeInput = (request: DocumentAnalysisRequest) =>
   Boolean(request.documentText?.trim()) || Boolean(request.documentFile);
 
-const createMockFileText = (request: DocumentAnalysisRequest) => {
-  if (request.documentText?.trim()) {
-    return request.documentText;
-  }
-
-  const fileName = request.documentFile?.name ?? "uploaded document";
-  return `Mock file analysis for ${fileName}. OCR is not active in mock mode.`;
-};
-
 const createAnalyzeRequestBody = (request: DocumentAnalysisRequest) => {
   if (!request.documentFile) {
     return JSON.stringify({
@@ -221,11 +212,7 @@ export const analyzeDocument = async (
       );
     }
 
-    const mockRequest: DocumentAnalysisRequest = {
-      ...request,
-      documentText: createMockFileText(request),
-    };
-    const scenario = scenarioFromRequest(mockRequest);
+    const scenario = scenarioFromRequest(request);
 
     if (scenario === "timeout") {
       throw createApiError(
@@ -250,7 +237,7 @@ export const analyzeDocument = async (
 
     if (scenario === "trusted-template") {
       return getMockAnalysisResult({
-        ...mockRequest,
+        ...request,
         documentText: "住民税納税通知書です。納期限を確認してください。",
         documentTypeHint: "tax notice",
       });
@@ -258,7 +245,7 @@ export const analyzeDocument = async (
 
     if (scenario === "ai-fallback" || scenario === "unknown-document") {
       return getMockAnalysisResult({
-        ...mockRequest,
+        ...request,
         documentText: "通知。確認してください。日付や手続き名の一部が読めません。",
         documentTypeHint: "unknown",
       });
@@ -268,7 +255,7 @@ export const analyzeDocument = async (
       return createNoDeadlineResult();
     }
 
-    return getMockAnalysisResult(mockRequest);
+    return getMockAnalysisResult(request);
   }
 
   if (!hasAnalyzeInput(request)) {
