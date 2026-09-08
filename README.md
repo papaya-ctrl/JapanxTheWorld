@@ -123,23 +123,6 @@ Use `VITE_MOCK_API_SCENARIO` or a document hint/text containing `simulate:<scena
 - Backend integration pending
 - Real AI API pending
 
-## Screenshots
-
-Screenshots are stored in `screenshots/`.
-
-Expected files:
-
-- `home-desktop.png`
-- `document-decoder-desktop.png`
-- `document-result-template-desktop.png`
-- `document-result-ai-desktop.png`
-- `life-guides-desktop.png`
-- `guide-detail-desktop.png`
-- `student-worker-desktop.png`
-- `dashboard-desktop.png`
-- `help-center-desktop.png`
-- `home-mobile.png`
-
 ## Privacy / AI Disclaimer
 
 JapanxTheWorld is a support tool. AI output and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.
