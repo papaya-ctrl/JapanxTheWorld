@@ -8,6 +8,7 @@
     "build": "tsc -noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:evaluation": "vitest run src/data/classificationEvaluation.test.ts --reporter=verbose",
     "test:watch": "vitest"
   },
   "dependencies": {

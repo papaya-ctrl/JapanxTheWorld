@@ -406,3 +406,11 @@ This is a future UI enhancement only. Do not redesign the result page.
 | --- | --- | --- |
 | `template` | `Verified Guide` | `Based on JapanxTheWorld trusted content` |
 | `ai` | `AI-assisted Explanation` | `Please confirm important details with official sources` |
+
+## 23. Trusted Result Generation V2 Mock Reference
+
+The frontend mock now implements the reusable deterministic reference in `src/data/trustedClassification.ts`. It normalizes Unicode with NFKC, lowercases English, normalizes Japanese punctuation and whitespace, and scores unique evidence only. Repeating one keyword does not increase the score.
+
+Template phrases, topic aliases, and topic keywords have different weights. Specific aliases and strong template phrases carry the most weight; broad terms such as `納付`, `保険料`, `期限`, or `許可` cannot establish a trusted topic by themselves. A trusted topic requires normalized confidence of at least `0.68` and specific evidence. A precise `documentTemplateId` additionally requires strong template evidence or a document marker. Competing specific topics are rejected when their scores are too close, and explicit ambiguity wording such as `どちら` or `不明` prevents an exact phrase from overriding the conflict.
+
+The mock may extract only explicit, valid deadline dates in supported Gregorian or Reiwa formats. A date without deadline context is ignored, and invalid calendar dates return `null`. Urgency is deterministic: explicit immediate/final-warning language can produce `urgent`; actionable trusted topics otherwise use `important`; clearly informational text can use `low`.

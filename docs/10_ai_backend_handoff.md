@@ -259,3 +259,20 @@ The backend should still extract a clearly present deadline when available. It m
 | `docs/09_ai_evaluation_plan.md` | Pass/fail evaluation process |
 | `docs/04_ai_document_decoder_spec.md` | Production-style prompt and AI rules |
 | `docs/11_trusted_knowledge_strategy.md` | Trusted knowledge first architecture and maintenance rules |
+
+## 13. V2 Classifier Reference For Backend Reuse
+
+`src/data/trustedClassification.ts` is the frontend/mock reference implementation, not a backend service. A backend implementation can reproduce its sequence:
+
+```txt
+NFKC/case/punctuation normalization
+-> unique alias and keyword matching
+-> weighted topic and template candidates
+-> conflict and explicit-ambiguity checks
+-> normalized confidence
+-> trusted topic/template at confidence >= 0.68 OR fallback
+```
+
+Do not copy only the numeric weights without the safety rules. Repeated terms are deduplicated, generic payment/insurance/tax words cannot qualify a topic, close specific candidates are rejected, and a template ID is withheld when the text proves only a broad topic. Internal match details may be logged through optional `TopicClassificationResult` debug fields, but the public `DocumentAnalysisResult` response remains unchanged.
+
+The backend can reuse the deadline rules for `YYYY年M月D日`, `YYYY/M/D`, `YYYY-M-D`, and valid Reiwa dates. It must preserve deadline context and calendar validation; a date mentioned as an event date is not automatically a deadline.

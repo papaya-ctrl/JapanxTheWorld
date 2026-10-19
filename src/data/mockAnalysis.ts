@@ -2,218 +2,215 @@ import type {
   AnalysisUrgency,
   DocumentAnalysisRequest,
   DocumentAnalysisResult,
+  DocumentTemplate,
   TrustedTopic,
 } from "../types";
+import { documentTemplates } from "./documentTemplates";
+import {
+  classifyTrustedInput,
+  extractExplicitDeadline,
+} from "./trustedClassification";
 import { trustedTopicsById } from "./trustedTopics";
 
-type KnownMockTopic = {
-  topicId: string;
-  documentType: string;
-  relatedGuide: string | null;
-  urgency: AnalysisUrgency;
-  triggers: string[];
+const templatesById = Object.fromEntries(
+  documentTemplates.map((template) => [template.id, template]),
+) as Record<string, DocumentTemplate>;
+
+const relatedGuideByTopicId: Record<string, string | null> = {
+  "address-registration-moving": "moving-address-registration",
+  "national-health-insurance": "health-insurance-payment",
+  "national-pension": "national-pension",
+  "residence-tax": "residence-tax-payment",
+  "residence-status-renewal": "residence-status-renewal",
+  "student-to-worker-transition": "job-hunting-before-graduation",
+  "part-time-work-permission": "part-time-work-permission",
+  "employment-working-conditions": "employment-working-conditions",
 };
 
-const knownMockTopics: KnownMockTopic[] = [
-  {
-    topicId: "residence-tax",
-    documentType: "Residence Tax Notice",
-    relatedGuide: "residence-tax-payment",
-    urgency: "important",
-    triggers: ["residence tax", "resident tax", "municipal tax", "inhabitant tax", "住民税", "市民税", "県民税", "tax"],
-  },
-  {
-    topicId: "national-health-insurance",
-    documentType: "National Health Insurance Notice",
-    relatedGuide: "health-insurance-payment",
-    urgency: "important",
-    triggers: ["national health insurance", "health insurance", "insurance", "nhi", "国民健康保険", "国保", "健康保険", "保険"],
-  },
-  {
-    topicId: "national-pension",
-    documentType: "National Pension Notice",
-    relatedGuide: "national-pension",
-    urgency: "important",
-    triggers: ["national pension", "pension", "国民年金", "年金", "学生納付特例"],
-  },
-  {
-    topicId: "address-registration-moving",
-    documentType: "Address Registration Notice",
-    relatedGuide: "moving-address-registration",
-    urgency: "important",
-    triggers: ["address registration", "moving", "change address", "住所変更", "転入", "転出", "転居", "住民登録"],
-  },
-  {
-    topicId: "residence-status-renewal",
-    documentType: "Immigration / Residence Status Notice",
-    relatedGuide: "residence-status-renewal",
-    urgency: "urgent",
-    triggers: ["residence status", "visa renewal", "immigration", "在留期間更新", "在留資格", "入国在留管理局", "出入国在留管理庁"],
-  },
-  {
-    topicId: "student-to-worker-transition",
-    documentType: "Student to Worker Status Change Notice",
-    relatedGuide: "job-hunting-before-graduation",
-    urgency: "important",
-    triggers: ["student to worker", "work status", "change status", "在留資格変更", "留学", "就労", "内定", "卒業"],
-  },
-  {
-    topicId: "part-time-work-permission",
-    documentType: "Part-Time Work Permission Notice",
-    relatedGuide: "part-time-work-permission",
-    urgency: "important",
-    triggers: ["part-time work", "work permission", "activity outside status", "資格外活動", "アルバイト許可", "アルバイト"],
-  },
-  {
-    topicId: "employment-working-conditions",
-    documentType: "Employment / Working Conditions Notice",
-    relatedGuide: "employment-working-conditions",
-    urgency: "important",
-    triggers: ["employment contract", "working conditions", "labor notice", "雇用契約", "労働条件", "賃金", "勤務時間"],
-  },
-];
+const fileDemoTopics = [
+  { terms: ["residence-tax", "resident-tax", "住民税"], topicId: "residence-tax" },
+  { terms: ["health-insurance", "nhi", "国民健康保険"], topicId: "national-health-insurance" },
+  { terms: ["national-pension", "pension", "国民年金"], topicId: "national-pension" },
+  { terms: ["address", "moving", "転入", "転出"], topicId: "address-registration-moving" },
+  { terms: ["residence-status", "visa-renewal", "在留期間更新"], topicId: "residence-status-renewal" },
+] as const;
 
-const createUnknownResult = (): DocumentAnalysisResult => ({
+const uniqueStrings = (items: string[]) => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.trim().toLowerCase().replace(/[.!。]/g, "");
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const createUnknownResult = (fileOnly = false): DocumentAnalysisResult => ({
   source: "ai",
   documentType: "Unknown Official Document",
-  summary:
-    "This looks like an official or administrative notice, but the exact topic cannot be determined from the provided text. The document may still require attention if it includes a sender, contact desk, deadline, or request for action. Because the purpose is unclear, use this result only as a cautious starting point.",
+  summary: fileOnly
+    ? "Mock mode cannot read the uploaded file because OCR is not active. The filename alone is not enough to verify the document's topic, deadline, amount, or required action. This result therefore remains unclassified."
+    : "The provided text does not contain enough specific, consistent evidence for a trusted topic or document template. A cautious fallback is safer than guessing a tax, pension, insurance, immigration, or work category. No clear deadline was established.",
   deadline: null,
   urgency: "important",
-  importantPoints: [
-    "The exact purpose is unclear from the provided text.",
-    "No clear deadline detected.",
-    "The sender, department, and requested action need official confirmation.",
-    "Missing or damaged text can change the meaning of an official notice.",
-  ],
+  importantPoints: fileOnly
+    ? [
+        "Mock mode did not perform OCR on the uploaded file.",
+        "No deadline, amount, sender, or instruction was read from the file.",
+        "A filename can be used only as an explicit demo label and does not verify file contents.",
+        "The actual document must be checked directly or processed by future OCR.",
+      ]
+    : [
+        "The exact document topic is unclear from the available text.",
+        "No clear deadline was safely extracted.",
+        "The sender, department, and requested action need official confirmation.",
+        "Missing, damaged, or conflicting text can change the meaning of a notice.",
+      ],
   nextSteps: [
     "Check the sender name, department, phone number, and address on the document.",
-    "Look again for words such as deadline, payment, submit, visit, or reply.",
+    "Look for a full procedure name, notice title, deadline, or requested action.",
     "Contact the issuing organization or bring the document to a trusted support desk.",
     "Ask for help before paying money, submitting documents, or ignoring the notice.",
   ],
   relatedGuide: null,
   officialWarning:
-    "This result may be incomplete because the document topic is unclear. Confirm the meaning, deadline, and required action with the official sender or a trusted support desk before acting.",
+    "This is an unverified fallback explanation because a trusted match was not established. Confirm the document's meaning, deadline, amount, and required action with the official sender or another official source before acting.",
 });
 
-const datePatterns = [
-  /(?:deadline|due date|by|until)[^\d]{0,20}(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})/i,
-  /(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})[^\n。]{0,20}(?:deadline|due date|by|until)/i,
-  /(?:納期限|提出期限|期限|まで)[^\d]{0,20}(20\d{2})年(\d{1,2})月(\d{1,2})日/,
-  /(20\d{2})年(\d{1,2})月(\d{1,2})日[^\n。]{0,20}(?:まで|納期限|提出期限|期限)/,
-];
-
-const toIsoDate = (year: string, month: string, day: string) =>
-  `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-
-const extractClearDeadline = (text: string): string | null => {
-  for (const pattern of datePatterns) {
-    const match = text.match(pattern);
-
-    if (match) {
-      return toIsoDate(match[1], match[2], match[3]);
-    }
-  }
-
-  return null;
-};
-
-const findKnownTopic = (combinedInput: string) =>
-  knownMockTopics.find((topic) =>
-    topic.triggers.some((trigger) => combinedInput.includes(trigger.toLowerCase())),
-  );
-
-const buildOfficialWarning = (topic: TrustedTopic, isFileOnly: boolean) => {
-  const baseWarning =
-    topic.warnings?.join(" ") ??
-    "Confirm important details with the official organization before acting.";
-  const confirmation =
-    "Important tax, immigration, pension, labor, insurance, or municipal details should be confirmed with official sources.";
-  const fileWarning = isFileOnly
-    ? " Mock mode did not read the uploaded file with OCR, so use this only as a filename-based demo result."
+const buildOfficialWarning = (topic: TrustedTopic, fileOnly: boolean) => {
+  const topicWarnings = topic.warnings?.join(" ") ?? "Do not rely on unverified details.";
+  const sourceNames = topic.officialSources.map((source) => source.organization);
+  const organizations = [...new Set(sourceNames)].slice(0, 2).join(" or ");
+  const confirmation = organizations
+    ? `Confirm the final requirements with ${organizations} or the organization that issued the document.`
+    : "Confirm the final requirements with the organization that issued the document.";
+  const fileWarning = fileOnly
+    ? " Mock mode did not read the uploaded file with OCR; this is only a filename-based demo label and not a reading of the file."
     : "";
 
-  return `${baseWarning} ${confirmation}${fileWarning}`;
+  return `${topicWarnings} ${confirmation}${fileWarning}`;
 };
 
 const buildSummary = (
   topic: TrustedTopic,
   documentType: string,
-  hasDeadline: boolean,
-  isFileOnly: boolean,
+  deadline: string | null,
+  fileOnly: boolean,
 ) => {
-  const deadlineSentence = hasDeadline
-    ? "A clear deadline was detected in the provided text."
-    : "No clear deadline was detected in the provided text.";
-  const fileSentence = isFileOnly
-    ? "In mock mode, the uploaded file was not read with OCR; this result is based on the file name and mock routing only."
-    : "This mock result uses JapanxTheWorld trusted topic content to explain the likely meaning.";
+  const deadlineSentence = deadline
+    ? `The provided text clearly states a deadline of ${deadline}.`
+    : "No clear deadline was safely established from the provided text.";
+  const sourceSentence = fileOnly
+    ? "The uploaded file was not read with OCR in mock mode, so the category is only a filename-based demo label."
+    : "The explanation uses maintained JapanxTheWorld trusted content; document-specific details still require official confirmation.";
 
-  return `${documentType}: ${topic.summary} ${deadlineSentence} ${fileSentence}`;
+  return `${documentType}: ${topic.summary} ${deadlineSentence} ${sourceSentence}`;
 };
 
-const createTopicResult = (
-  topicConfig: KnownMockTopic,
-  request: DocumentAnalysisRequest,
-  combinedInput: string,
+const determineUrgency = (text: string, deadline: string | null): AnalysisUrgency => {
+  const normalized = text.normalize("NFKC").toLowerCase();
+  if (/(至急|直ちに|本日中|最終督促|最終通知|immediately|urgent|final notice)/i.test(normalized)) {
+    return "urgent";
+  }
+
+  const informational =
+    /(情報のみ|参考情報|制度に関する案内|説明しています|information only|for your information)/i.test(
+      normalized,
+    );
+  const actionLanguage = /(支払|納付|提出|申請|持参|訪問|連絡|確認してください|must|required)/i.test(
+    normalized,
+  );
+  if (!deadline && informational && !actionLanguage) {
+    return "low";
+  }
+
+  return "important";
+};
+
+const createTrustedResult = (
+  topic: TrustedTopic,
+  template: DocumentTemplate | null,
+  text: string,
+  fileOnly = false,
 ): DocumentAnalysisResult => {
-  const topic = trustedTopicsById[topicConfig.topicId];
-  const isFileOnly = Boolean(request.documentFile) && !request.documentText?.trim();
-  const deadline = isFileOnly ? null : extractClearDeadline(combinedInput);
-  const filePoint = isFileOnly
-    ? ["Mock mode did not perform OCR on the uploaded file, so no deadline, amount, or specific instruction was read from the file."]
+  const deadline = fileOnly ? null : extractExplicitDeadline(text);
+  const documentType = template?.documentType ?? topic.title;
+  const deadlinePoint = deadline
+    ? [`The explicit deadline shown in the provided text is ${deadline}.`]
+    : ["No explicit deadline was safely detected; do not assume a date from the topic alone."];
+  const filePoint = fileOnly
+    ? [
+        "Mock mode did not perform OCR, so no deadline, amount, sender, or instruction was read from the uploaded file.",
+      ]
     : [];
 
   return {
     source: "template",
-    documentType: topicConfig.documentType,
-    summary: buildSummary(topic, topicConfig.documentType, Boolean(deadline), isFileOnly),
+    documentType,
+    summary: buildSummary(topic, documentType, deadline, fileOnly),
     deadline,
-    urgency: topicConfig.urgency,
-    importantPoints: [
-      ...topic.importantPoints,
+    urgency: fileOnly ? "important" : determineUrgency(text, deadline),
+    importantPoints: uniqueStrings([
+      ...deadlinePoint,
       ...filePoint,
-      "Any missing amount, deadline, sender, or eligibility detail must be confirmed from the actual notice or official source.",
-    ].slice(0, 6),
-    nextSteps: topic.nextSteps.slice(0, 6),
-    relatedGuide: topicConfig.relatedGuide,
-    officialWarning: buildOfficialWarning(topic, isFileOnly),
+      ...topic.importantPoints,
+    ]).slice(0, 6),
+    nextSteps: uniqueStrings(topic.nextSteps).slice(0, 6),
+    relatedGuide: template?.relatedGuide ?? relatedGuideByTopicId[topic.id] ?? null,
+    officialWarning: buildOfficialWarning(topic, fileOnly),
   };
 };
 
-export const mockAnalysisResults: DocumentAnalysisResult[] = [
-  createTopicResult(
-    knownMockTopics[0],
-    {
-      documentText:
-        "住民税のお知らせです。2026年7月31日までに内容を確認してください。お問い合わせは市役所へお願いします。",
-    },
-    "住民税のお知らせです。2026年7月31日までに内容を確認してください。",
-  ),
-  createTopicResult(
-    knownMockTopics[1],
-    {
-      documentText:
-        "国民健康保険のお知らせです。2026年8月10日までに内容を確認してください。お問い合わせは市役所へお願いします。",
-    },
-    "国民健康保険のお知らせです。2026年8月10日までに内容を確認してください。",
-  ),
-  createUnknownResult(),
-];
+const createFileOnlyDemoResult = (request: DocumentAnalysisRequest) => {
+  const fileName = request.documentFile?.name.normalize("NFKC").toLowerCase() ?? "";
+  const demoTopic = fileDemoTopics.find((candidate) =>
+    candidate.terms.some((term) => fileName.includes(term.toLowerCase())),
+  );
+
+  if (!demoTopic) {
+    return createUnknownResult(true);
+  }
+
+  const topic = trustedTopicsById[demoTopic.topicId];
+  const template =
+    documentTemplates.find((candidate) => candidate.relatedTopicId === demoTopic.topicId) ??
+    null;
+  return createTrustedResult(topic, template, "", true);
+};
 
 export const getMockAnalysisResult = (
   request: DocumentAnalysisRequest,
 ): DocumentAnalysisResult => {
-  const text = request.documentText ?? "";
-  const hint = request.documentTypeHint?.toLowerCase() ?? "";
-  const fileName = request.documentFile?.name.toLowerCase() ?? "";
-  const combinedInput = `${text} ${hint} ${fileName}`.toLowerCase();
-  const knownTopic = findKnownTopic(combinedInput);
+  const text = request.documentText?.trim() ?? "";
+  const hint = request.documentTypeHint?.trim() ?? "";
 
-  if (knownTopic) {
-    return createTopicResult(knownTopic, request, `${text} ${hint}`);
+  if (!text && request.documentFile) {
+    return createFileOnlyDemoResult(request);
   }
 
-  return createUnknownResult();
+  const combinedInput = `${hint} ${text}`.trim();
+  const classification = classifyTrustedInput(combinedInput);
+  if (!classification.topicId) {
+    return createUnknownResult();
+  }
+
+  const topic = trustedTopicsById[classification.topicId];
+  const template = classification.documentTemplateId
+    ? templatesById[classification.documentTemplateId] ?? null
+    : null;
+  return createTrustedResult(topic, template, combinedInput);
 };
+
+export const mockAnalysisResults: DocumentAnalysisResult[] = [
+  getMockAnalysisResult({
+    documentText:
+      "住民税納税通知書です。納期限は2026年7月31日です。市役所の税務課へ確認してください。",
+  }),
+  getMockAnalysisResult({
+    documentText:
+      "国民健康保険料の納付書です。支払期限は2026年8月10日です。保険課へ確認してください。",
+  }),
+  getMockAnalysisResult({
+    documentText: "重要なお知らせです。内容を確認してください。",
+  }),
+];

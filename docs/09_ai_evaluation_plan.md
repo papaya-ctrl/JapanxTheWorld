@@ -71,3 +71,19 @@ Evaluate whether `POST /api/documents/analyze` returns stable, useful, safe `Doc
 | Invented date | Deadline extraction rules must be tightened |
 | Wrong category | Classification examples or manual matching rules should be improved |
 | Overconfident classification | Matching thresholds or conflict handling should be adjusted |
+
+## 8. V2 Automated Evaluation
+
+Run `npm run test:evaluation` to evaluate the mock classifier and result generator against `src/data/aiTestCases.ts`. The dataset contains 54 synthetic cases: five coverage variants for each of the eight Manual Trusted Content V1 topics, 12 ambiguous/conflicting/unrelated/malformed negatives, and two punctuation or bilingual format variants.
+
+The automated helper derives these metrics from execution rather than recording expected percentages by hand:
+
+- classification correctness, including topic and template distinction
+- false trusted matches
+- unknown/ambiguous rejection accuracy
+- explicit deadline extraction correctness
+- `DocumentAnalysisResult` schema validity
+- required official-warning presence
+- related Life Guide correctness
+
+The current measured result is recorded in `docs/14_trusted_result_v2_evaluation.md`. Any classifier or dataset change must rerun the command and update that report with the actual output.

@@ -71,6 +71,12 @@ export type TopicClassificationResult = {
   documentTemplateId: string | null;
   confidence: number;
   reason?: string;
+  matchedAliases?: string[];
+  matchedKeywords?: string[];
+  candidateScores?: Array<{
+    topicId: string;
+    score: number;
+  }>;
 };
 
 export type DocumentTemplate = DocumentAnalysisResult & {

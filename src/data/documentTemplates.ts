@@ -53,7 +53,7 @@ export const documentTemplateResults = {
       "Contact the pension office or city office if you are unsure.",
       "Ask official support before assuming you qualify for exemption or delay.",
     ],
-    relatedGuide: null,
+    relatedGuide: "national-pension",
     officialWarning:
       "This is a support explanation, not a final pension decision. Please confirm pension procedures with the official pension office or city office.",
   },
@@ -62,7 +62,13 @@ export const documentTemplateResults = {
     source: "template",
     documentType: "Residence Tax Notice",
     matchKeywords: ["住民税", "市民税", "県民税", "納税通知書", "residence tax", "resident tax"],
-    strongMatchKeywords: ["住民税納税通知書", "市民税県民税", "Residence Tax Notice"],
+    strongMatchKeywords: [
+      "住民税納税通知書",
+      "住民税のお知らせ",
+      "市民税県民税",
+      "Residence Tax Notice",
+      "Resident Tax Notice",
+    ],
     relatedTopicId: "residence-tax",
     trustedSummary:
       "This notice is about residence tax. It may show the amount to pay, payment periods, and where to ask questions.",
@@ -90,7 +96,15 @@ export const documentTemplateResults = {
     source: "template",
     documentType: "Address Registration Notice",
     matchKeywords: ["住所", "転入", "転出", "転居", "住民登録", "address registration", "moving notice"],
-    strongMatchKeywords: ["転入届", "転出届", "住所登録", "moving procedures"],
+    strongMatchKeywords: [
+      "転入届",
+      "転出届",
+      "転居届",
+      "住所変更届",
+      "住所登録",
+      "moving notice",
+      "moving procedures",
+    ],
     relatedTopicId: "address-registration-moving",
     trustedSummary:
       "This notice is about registering or changing your address after moving in Japan.",
@@ -118,7 +132,7 @@ export const documentTemplateResults = {
     source: "template",
     documentType: "Immigration / Residence Status Notice",
     matchKeywords: ["在留資格", "在留期間", "入国在留管理局", "追加資料", "residence status", "immigration"],
-    strongMatchKeywords: ["在留期間更新", "在留資格変更", "入国在留管理局"],
+    strongMatchKeywords: ["在留期間更新", "在留資格更新", "更新申請"],
     relatedTopicId: "residence-status-renewal",
     trustedSummary:
       "This notice is about an immigration or residence-status procedure. It may ask for documents, confirmation, or an official visit.",
@@ -137,7 +151,7 @@ export const documentTemplateResults = {
       "Prepare only the documents clearly requested by the official notice.",
       "Do not assume approval, denial, or status change from this explanation.",
     ],
-    relatedGuide: null,
+    relatedGuide: "residence-status-renewal",
     officialWarning:
       "This is a support explanation, not immigration advice or an approval decision. Please confirm all residence-status procedures with official immigration sources.",
   },
@@ -196,6 +210,86 @@ export const documentTemplateResults = {
     relatedGuide: null,
     officialWarning:
       "This is a support explanation, not legal advice or a final contract decision. Please confirm working-conditions questions with official labor support or a trusted adviser.",
+  },
+  studentToWorkerTransition: {
+    id: "student-to-worker-transition-notice",
+    source: "template",
+    documentType: "Student to Worker Status Change Notice",
+    matchKeywords: [
+      "在留資格変更",
+      "留学",
+      "就労",
+      "卒業",
+      "内定",
+      "student to worker",
+      "change status after graduation",
+    ],
+    strongMatchKeywords: [
+      "留学から就労資格への変更",
+      "留学から就労",
+      "在留資格変更許可申請",
+      "student to work visa",
+    ],
+    relatedTopicId: "student-to-worker-transition",
+    trustedSummary:
+      "This document appears to concern changing from Student residence status to a work-related status after graduation or a job offer.",
+    summary:
+      "This document appears to concern changing from Student residence status to a work-related status after graduation or a job offer.",
+    deadline: null,
+    defaultUrgency: "important",
+    urgency: "important",
+    importantPoints: [
+      "A job offer does not automatically change residence status.",
+      "Check graduation timing, the planned job start date, and the current period of stay together.",
+      "The school, employer, and immigration office may each need to provide or confirm documents.",
+    ],
+    nextSteps: [
+      "Confirm the job duties and start date with the employer.",
+      "Ask the school which graduation or support documents it can provide.",
+      "Confirm the final application and timing with official immigration sources.",
+    ],
+    relatedGuide: "job-hunting-before-graduation",
+    officialWarning:
+      "This is a support explanation, not an immigration decision or approval guarantee. Confirm the status-change procedure with the Immigration Services Agency or a regional immigration office.",
+  },
+  partTimeWorkPermission: {
+    id: "part-time-work-permission-notice",
+    source: "template",
+    documentType: "Student Part-Time Work Permission Notice",
+    matchKeywords: [
+      "資格外活動",
+      "アルバイト許可",
+      "学生のアルバイト",
+      "part-time work permission",
+      "activity outside status",
+    ],
+    strongMatchKeywords: [
+      "資格外活動許可",
+      "資格外活動許可申請",
+      "activity outside status",
+      "permission to engage in activity outside status",
+    ],
+    relatedTopicId: "part-time-work-permission",
+    trustedSummary:
+      "This document appears to concern immigration permission for paid activity outside a student's current residence status.",
+    summary:
+      "This document appears to concern immigration permission for paid activity outside a student's current residence status.",
+    deadline: null,
+    defaultUrgency: "important",
+    urgency: "important",
+    importantPoints: [
+      "A job offer or work schedule is not the same as immigration permission.",
+      "Check the residence card and official immigration documents for permission details.",
+      "School rules and employer paperwork are separate from immigration permission.",
+    ],
+    nextSteps: [
+      "Check the residence card and any immigration permission document.",
+      "Ask the school whether students must report part-time work.",
+      "Confirm unclear permission details with official immigration sources before starting work.",
+    ],
+    relatedGuide: "part-time-work-permission",
+    officialWarning:
+      "This is a support explanation, not immigration permission. Confirm whether work is allowed with the Immigration Services Agency or a regional immigration office before relying on this result.",
   },
   generalCityHall: {
     id: "general-city-hall-notice",

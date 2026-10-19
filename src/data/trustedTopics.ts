@@ -373,6 +373,7 @@ export const trustedTopics: TrustedTopic[] = [
       "在留資格変更",
       "student to worker",
       "student to work visa",
+      "就労資格への変更",
       "change status after graduation",
       "job after graduation",
       "work status",

@@ -152,3 +152,11 @@ AI must not freely regenerate trusted procedural content for high-confidence kno
 | `ai` | `AI-assisted Explanation` | `Please confirm important details with official sources` |
 
 This is a small future UI enhancement. The current result page should keep one shared layout.
+
+## 14. V2 Confidence And Ambiguity Policy
+
+The deterministic mock classifier accepts trusted routing at normalized confidence `0.68` or higher only when at least one specific alias is present. Ordinary keywords can support a match but cannot promote a generic input by themselves. Evidence is counted once, so repeated words do not manufacture confidence.
+
+Strong document-template phrases can select a precise template when they decisively beat alternatives. However, close topic scores or explicit uncertainty wording reject trusted routing. Broad topic wording may return a trusted `topicId` while keeping `documentTemplateId: null`; this prevents a question about `住民税` from being mislabeled as a residence-tax notice.
+
+The 54-case V2 dataset covers all eight maintained V1 topics, negative inputs, common confusions, mixed Japanese/English wording, punctuation variation, and deadline formats. Changes to aliases, keywords, templates, or thresholds should be evaluated with `npm run test:evaluation` before they are accepted.
