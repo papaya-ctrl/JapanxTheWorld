@@ -138,6 +138,12 @@ Production setup and remaining gates are in the [preparation guide](docs/16_prod
 [readiness report](docs/17_production_readiness_report.md) and
 [privacy draft](docs/18_privacy_retention_draft.md).
 
+Step 11 adds [disposable Linux staging commands](docs/19_linux_staging.md) and an
+[updated staging readiness report](docs/20_staging_readiness_report.md). Bounded
+macOS HTTPS/OCR/recovery checks passed; Linux container execution remains pending
+because Docker was unavailable and host memory was insufficient. Public deployment
+remains NO-GO.
+
 ## Privacy / AI Disclaimer
 
 JapanxTheWorld is a support tool. Extracted results and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.

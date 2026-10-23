@@ -4,3 +4,5 @@ reportlab==4.5.1
 
 # Explicit one-time official model download utility, never called by the API.
 huggingface-hub==2.2.0
+# Authenticated encryption for bounded disposable staging backup/recovery tests.
+cryptography==50.0.2

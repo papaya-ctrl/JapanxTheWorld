@@ -1,0 +1,164 @@
+name: ${STAGING_PROJECT:?Run staging/prepare.py first and pass its private compose.env}
+x-backend: &backend
+  platform: ${STAGING_PLATFORM:-linux/amd64}
+  build:
+    context: ..
+    dockerfile: staging/backend.Dockerfile
+    target: runtime
+  image: ${STAGING_PROJECT}-backend
+  user: "${STAGING_UID:-10001}:${STAGING_GID:-10001}"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  init: true
+  mem_limit: 6500m
+  memswap_limit: 6500m
+  cpus: 4
+  pids_limit: 96
+  stop_grace_period: 170s
+  ulimits:
+    core: 0
+    nofile: 1024
+  environment: &environment
+    STAGING_PROJECT: ${STAGING_PROJECT:?}
+    DJANGO_SETTINGS_MODULE: config.settings_production
+    DJANGO_ALLOWED_HOSTS: api.staging.test
+    DJANGO_CORS_ALLOWED_ORIGINS: https://app.staging.test:${STAGING_HTTPS_PORT:-18443}
+    DJANGO_CSRF_TRUSTED_ORIGINS: https://app.staging.test:${STAGING_HTTPS_PORT:-18443},https://api.staging.test:${STAGING_HTTPS_PORT:-18443}
+    DJANGO_TRUSTED_PROXY_IPS: 127.0.0.1,::1
+    DJANGO_STATE_DIR: /var/lib/japanxtheworld
+    DJANGO_STATIC_ROOT: /srv/static
+    DOCUMENT_OCR_MODEL_ROOT: /opt/models
+    STAGING_SECRET_FILE: /run/secrets/django_key
+    DJANGO_HSTS_INCLUDE_SUBDOMAINS: "false"
+    DJANGO_HSTS_PRELOAD: "false"
+    TMPDIR: /var/lib/japanxtheworld/tmp
+  volumes: &volumes
+    - state:/var/lib/japanxtheworld
+    - models:/opt/models:ro
+    - static:/srv/static
+  secrets: [django_key]
+  networks: [private]
+  logging:
+    driver: local
+    options: {max-size: 5m, max-file: "2"}
+
+services:
+  prepare:
+    <<: *backend
+    user: "0:0"
+    entrypoint: [python, /app/backend/staging_tools/prepare_volumes.py]
+    command: []
+    profiles: [setup]
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 1
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    environment: {STAGING_PROJECT: "${STAGING_PROJECT:?}", STAGING_UID: "${STAGING_UID:-10001}", STAGING_GID: "${STAGING_GID:-10001}"}
+    volumes:
+      - state:/var/lib/japanxtheworld
+      - models:/opt/models
+      - static:/srv/static
+    secrets: []
+  model-setup:
+    <<: *backend
+    profiles: [setup]
+    secrets: []
+    build: {context: .., dockerfile: staging/backend.Dockerfile, target: model-setup}
+    image: ${STAGING_PROJECT}-model-setup
+    mem_limit: 768m
+    memswap_limit: 768m
+    cpus: 1
+    environment: {HOME: /var/lib/japanxtheworld, HF_HUB_DISABLE_TELEMETRY: "1"}
+    volumes: [models:/opt/models, state:/var/lib/japanxtheworld]
+    networks: [setup]
+    command: [--size, medium, --root, /opt/models]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m,uid=${STAGING_UID:-10001},gid=${STAGING_GID:-10001},mode=0700"]
+  backend:
+    <<: *backend
+    ports:
+      - "127.0.0.1:${STAGING_HTTP_PORT:-18080}:8080"
+      - "127.0.0.1:${STAGING_HTTPS_PORT:-18443}:8443"
+    healthcheck:
+      test: [CMD, python, /app/backend/staging_tools/healthcheck.py]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+  proxy:
+    platform: ${STAGING_PLATFORM:-linux/amd64}
+    build:
+      context: ..
+      dockerfile: staging/frontend.Dockerfile
+      args:
+        VITE_API_BASE_URL: https://api.staging.test:${STAGING_HTTPS_PORT:-18443}/api
+    image: ${STAGING_PROJECT}-proxy
+    network_mode: service:backend
+    depends_on: {backend: {condition: service_healthy}}
+    user: "${STAGING_UID:-10001}:${STAGING_GID:-10001}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 1
+    pids_limit: 32
+    volumes:
+      - ${STAGING_DIRECTORY:?}/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${STAGING_DIRECTORY:?}/headers.conf:/etc/nginx/snippets/jxtw-headers.conf:ro
+      - static:/srv/static:ro
+    secrets:
+      - {source: tls_key, target: tls_key.pem}
+      - {source: tls_cert, target: tls_cert.pem}
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=2m,uid=${STAGING_UID:-10001},gid=${STAGING_GID:-10001},mode=0700
+      - /var/cache/nginx:rw,noexec,nosuid,size=16m,uid=${STAGING_UID:-10001},gid=${STAGING_GID:-10001},mode=0700
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8081/]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging: {driver: local, options: {max-size: 5m, max-file: "2"}}
+  qa:
+    <<: *backend
+    profiles: [qa]
+    secrets: []
+    build: {context: .., dockerfile: staging/backend.Dockerfile, target: qa}
+    image: ${STAGING_PROJECT}-qa
+    mem_limit: 768m
+    memswap_limit: 768m
+    cpus: 2
+    command: [test, tests, --verbosity, "1"]
+    environment: {DJANGO_SETTINGS_MODULE: config.settings_development, DJANGO_DB_PATH: /tmp/qa.sqlite3, HOME: /tmp}
+    volumes: [models:/opt/models:ro]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m,uid=${STAGING_UID:-10001},gid=${STAGING_GID:-10001},mode=0700"]
+  benchmark:
+    <<: *backend
+    profiles: [benchmark]
+    secrets: []
+    build: {context: .., dockerfile: staging/backend.Dockerfile, target: qa}
+    image: ${STAGING_PROJECT}-qa
+    command: [benchmark, --small-synthetic, --repeat, "3"]
+    environment:
+      HOME: /var/lib/japanxtheworld
+      DOCUMENT_OCR_MODEL_ROOT: /opt/models
+      STAGING_PLATFORM: ${STAGING_PLATFORM:-linux/amd64}
+      STAGING_HOST_MACHINE: ${STAGING_HOST_MACHINE:-unknown}
+      STAGING_HOST_OS: ${STAGING_HOST_OS:-unknown}
+    volumes:
+      - models:/opt/models:ro
+      - state:/var/lib/japanxtheworld
+      - ${STAGING_DIRECTORY:?}/benchmark-inputs:/private-inputs:ro
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=96m,uid=${STAGING_UID:-10001},gid=${STAGING_GID:-10001},mode=0700"]
+
+networks:
+  private: {internal: true}
+  setup: {}
+volumes:
+  state: {}
+  models: {}
+  static: {}
+secrets:
+  django_key: {file: "${STAGING_DIRECTORY:?}/secrets/django_key"}
+  tls_key: {file: "${STAGING_DIRECTORY:?}/secrets/tls_key.pem"}
+  tls_cert: {file: "${STAGING_DIRECTORY:?}/secrets/tls_cert.pem"}

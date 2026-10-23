@@ -1,0 +1,436 @@
+{
+  "date": "2026-10-23",
+  "linuxExecuted": false,
+  "linuxMetrics": null,
+  "localHttps": {
+    "cases": [
+      {
+        "case": "registration_closed",
+        "status": 403,
+        "passed": true,
+        "seconds": 0.0036
+      },
+      {
+        "case": "login_1",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0887
+      },
+      {
+        "case": "login_2",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0945
+      },
+      {
+        "case": "invalid_credentials",
+        "status": 401,
+        "passed": true,
+        "seconds": 0.091
+      },
+      {
+        "case": "unauthorized_checklist",
+        "status": 401,
+        "passed": true,
+        "seconds": 0.0028
+      },
+      {
+        "case": "liveness",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0058
+      },
+      {
+        "case": "readiness",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0205
+      },
+      {
+        "case": "cors_preflight",
+        "status": 204,
+        "passed": true,
+        "seconds": 0.0015
+      },
+      {
+        "case": "untrusted_cors_origin",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0058
+      },
+      {
+        "case": "life_guides",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0048
+      },
+      {
+        "case": "official_resources",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0059
+      },
+      {
+        "case": "frontend_document_decoder",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0135
+      },
+      {
+        "case": "admin_csrf_cookie",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0195
+      },
+      {
+        "case": "missing_csrf_denied",
+        "status": 403,
+        "passed": true,
+        "seconds": 0.004
+      },
+      {
+        "case": "valid_admin_session",
+        "status": 302,
+        "passed": true,
+        "seconds": 0.0932
+      },
+      {
+        "case": "session_api_csrf_denied",
+        "status": 403,
+        "passed": true,
+        "seconds": 0.0052
+      },
+      {
+        "case": "checklist_create",
+        "status": 201,
+        "passed": true,
+        "seconds": 0.0072
+      },
+      {
+        "case": "checklist_read",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0075
+      },
+      {
+        "case": "checklist_other_account",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0049
+      },
+      {
+        "case": "checklist_cross_account_write_denied",
+        "status": 404,
+        "passed": true,
+        "seconds": 0.0069
+      },
+      {
+        "case": "checklist_update",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0073
+      },
+      {
+        "case": "checklist_delete",
+        "status": 204,
+        "passed": true,
+        "seconds": 0.0079
+      },
+      {
+        "case": "checklist_recovery_seed",
+        "status": 201,
+        "passed": true,
+        "seconds": 0.0244
+      },
+      {
+        "case": "unauthorized_ocr",
+        "status": 401,
+        "passed": true,
+        "seconds": 0.0028
+      },
+      {
+        "case": "unprivileged_ocr",
+        "status": 403,
+        "passed": true,
+        "seconds": 0.0197
+      },
+      {
+        "case": "invalid_contents",
+        "status": 400,
+        "passed": true,
+        "seconds": 0.0255
+      },
+      {
+        "case": "partial_document",
+        "status": 200,
+        "passed": true,
+        "seconds": 2.6957
+      },
+      {
+        "case": "unknown_document",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.4547
+      },
+      {
+        "case": "two_page_scanned_pdf",
+        "status": 200,
+        "passed": true,
+        "seconds": 1.6862
+      },
+      {
+        "case": "corrupted_image",
+        "status": 400,
+        "passed": true,
+        "seconds": 0.0137
+      },
+      {
+        "case": "corrupted_pdf",
+        "status": 400,
+        "passed": true,
+        "seconds": 0.0116
+      },
+      {
+        "case": "concurrent_ocr",
+        "statuses": [
+          200,
+          503
+        ],
+        "passed": true
+      },
+      {
+        "case": "proxy_rate_limit",
+        "statuses": [
+          401,
+          401,
+          429
+        ],
+        "passed": true
+      },
+      {
+        "case": "logout",
+        "status": 200,
+        "passed": true,
+        "seconds": 0.0089
+      },
+      {
+        "case": "revoked_token",
+        "status": 401,
+        "passed": true,
+        "seconds": 0.006
+      },
+      {
+        "case": "expired_token",
+        "status": 401,
+        "passed": true,
+        "seconds": 0.0067
+      },
+      {
+        "case": "backend_unavailable",
+        "status": 502,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "nativeCasesExecuted": true,
+    "automaticOcrRetries": 0,
+    "sensitiveResultsPersisted": false,
+    "registrationPolicy": "closed_in_production",
+    "httpRedirectStatuses": [
+      308,
+      308
+    ],
+    "environment": {
+      "os": "Darwin",
+      "machine": "arm64",
+      "linuxContainer": false
+    },
+    "maximumHeavyProcesses": 1,
+    "sampledPeakProcessMiB": 900,
+    "containerMemoryMiB": null,
+    "encryptedBackupRestored": true,
+    "restoredMigrationsCurrent": true,
+    "serverSigningKeyExcludedFromSnapshot": true,
+    "temporaryDocumentFiles": 0,
+    "documentRowsStored": 0,
+    "restoredAuthenticationAndChecklistVerified": true,
+    "allowlistedApplicationLogs": true,
+    "productionHstsWarnings": [
+      "security.W005",
+      "security.W021"
+    ]
+  },
+  "smallMacBenchmark": {
+    "environment": {
+      "os": "Darwin",
+      "machine": "arm64",
+      "python": "3.12.13",
+      "logicalCpus": 10,
+      "hostRamGiB": 16.0,
+      "cgroupMemoryLimitMiB": null,
+      "versions": {
+        "paddleocr": "3.7.0",
+        "paddlepaddle": "3.2.0",
+        "paddlex": "3.7.2",
+        "Pillow": "13.0.0"
+      },
+      "samplingSeconds": 0.05,
+      "platformRequested": null,
+      "containerExecution": false
+    },
+    "workload": "explicitly_synthetic_480x480_japanese",
+    "configuration": {
+      "models": "Medium/Medium",
+      "batch": 1,
+      "cpuThreads": 4,
+      "detectorSide": 1600,
+      "rssCapGiB": 5
+    },
+    "rows": [
+      {
+        "request": 1,
+        "seconds": 2.6233,
+        "modelInitSeconds": 1.9457,
+        "inferenceSeconds": 0.5924,
+        "peakRssMiB": 875.77,
+        "rssAfterMiB": 875.77,
+        "cpuUtilizationPercent": 71.5,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": false,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": true
+      },
+      {
+        "request": 2,
+        "seconds": 0.5593,
+        "modelInitSeconds": 0.0,
+        "inferenceSeconds": 0.5581,
+        "peakRssMiB": 876.72,
+        "rssAfterMiB": 876.23,
+        "cpuUtilizationPercent": 91.6,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": true,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": true
+      },
+      {
+        "request": 3,
+        "seconds": 0.5605,
+        "modelInitSeconds": 0.0,
+        "inferenceSeconds": 0.5596,
+        "peakRssMiB": 876.23,
+        "rssAfterMiB": 876.23,
+        "cpuUtilizationPercent": 92.7,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": true,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": true
+      }
+    ],
+    "coldSeconds": 2.6233,
+    "medianWarmSeconds": 0.5599,
+    "estimatedSerialDocumentsPerMinute": 107.16,
+    "endRssGrowthMiB": 0.46,
+    "workerClosed": true,
+    "recycleMode": false,
+    "memoryGrowthLimitation": "Only bounded requests; not a leak or sustained-throughput proof."
+  },
+  "macRecyclingBenchmark": {
+    "environment": {
+      "os": "Darwin",
+      "machine": "arm64",
+      "python": "3.12.13",
+      "logicalCpus": 10,
+      "hostRamGiB": 16.0,
+      "cgroupMemoryLimitMiB": null,
+      "versions": {
+        "paddleocr": "3.7.0",
+        "paddlepaddle": "3.2.0",
+        "paddlex": "3.7.2",
+        "Pillow": "13.0.0"
+      },
+      "samplingSeconds": 0.05,
+      "platformRequested": null,
+      "containerExecution": false
+    },
+    "workload": "explicitly_synthetic_480x480_japanese",
+    "configuration": {
+      "models": "Medium/Medium",
+      "batch": 1,
+      "cpuThreads": 4,
+      "detectorSide": 1600,
+      "rssCapGiB": 5
+    },
+    "rows": [
+      {
+        "request": 1,
+        "seconds": 2.5508,
+        "modelInitSeconds": 1.8575,
+        "inferenceSeconds": 0.6038,
+        "peakRssMiB": 890.31,
+        "rssAfterMiB": 890.31,
+        "cpuUtilizationPercent": 77.2,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": false,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": true
+      },
+      {
+        "request": 2,
+        "seconds": 0.5566,
+        "modelInitSeconds": 0.0,
+        "inferenceSeconds": 0.5542,
+        "peakRssMiB": 890.41,
+        "rssAfterMiB": 890.41,
+        "cpuUtilizationPercent": 86.8,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": true,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": true
+      },
+      {
+        "request": 3,
+        "seconds": 1.7503,
+        "modelInitSeconds": 1.0817,
+        "inferenceSeconds": 0.5817,
+        "peakRssMiB": 890.77,
+        "rssAfterMiB": 890.77,
+        "cpuUtilizationPercent": 96.8,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": false,
+        "workerRecycled": true,
+        "knownSyntheticFieldsCorrect": true
+      }
+    ],
+    "coldSeconds": 2.5508,
+    "medianWarmSeconds": 0.5566,
+    "estimatedSerialDocumentsPerMinute": 107.8,
+    "endRssGrowthMiB": 0.46,
+    "workerClosed": true,
+    "recycleMode": true,
+    "memoryGrowthLimitation": "Only bounded requests; not a leak or sustained-throughput proof."
+  },
+  "tests": {
+    "backendPassed": 150,
+    "hostStagingPassed": 9,
+    "frontendPassed": 112,
+    "productionBuildPassed": true
+  },
+  "accuracyCoverage": {
+    "realPrivate": 1,
+    "synthetic": 11,
+    "completeRealGroundTruth": 0,
+    "realFullTranscriptions": 0
+  },
+  "readiness": {
+    "localBoundedMac": "conditional_go",
+    "privateLinux": "no_go_pending_execution",
+    "publicProduction": "no_go"
+  }
+}

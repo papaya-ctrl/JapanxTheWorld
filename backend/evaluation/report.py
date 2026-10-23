@@ -6,6 +6,7 @@ from math import isfinite
 from pathlib import Path
 from .runner import summarize
 from .profiles import PROFILES
+from .review import summary as review_summary
 
 
 def publish(metric_paths, output):
@@ -18,6 +19,7 @@ def publish(metric_paths, output):
                 selected=[r for r in profile["rows"] if r["provenance"]==provenance]
                 if not selected:continue
                 result=summarize(selected)
+                reviews=review_summary(selected)
                 rows.append({"run":report_index+1,"profile":name,"provenance":provenance,
                     "requests":result["requests"],"successful":result["successful"],"unexpectedFailures":result["unexpectedFailures"],
                     "peakRssMiB":result["peakRssMiB"],"coldSeconds":result["coldSeconds"],"medianWarmSeconds":result["medianWarmSeconds"],
@@ -39,7 +41,12 @@ def publish(metric_paths, output):
                     "documentTypeCorrect":result["documentTypeCorrect"]["correct"],
                     "documentTypeScored":result["documentTypeCorrect"]["scored"],
                     "extractionStatusCorrect":result["extractionStatusCorrect"]["correct"],
-                    "extractionStatusScored":result["extractionStatusCorrect"]["scored"]})
+                    "extractionStatusScored":result["extractionStatusCorrect"]["scored"],
+                    "manuallyReviewedRequests":reviews["reviewedRequests"],
+                    "reviewedOcrRecognitionErrors":reviews["ocr_recognition"],
+                    "reviewedFieldExtractionErrors":reviews["field_extraction"],
+                    "reviewedInterpretationErrors":reviews["interpretation"],
+                    "reviewedUnresolvedErrors":reviews["unresolved"]})
     if not rows: raise ValueError("No supported aggregate rows to publish.")
     for row in rows:
         for key, value in row.items():

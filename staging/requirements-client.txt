@@ -1,0 +1,5 @@
+# Lightweight host-side staging controller; no OCR model/framework installation.
+Pillow==13.0.0
+reportlab==4.5.1
+cryptography==50.0.2
+psutil==7.2.2

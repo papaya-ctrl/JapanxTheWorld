@@ -13,6 +13,7 @@ import time
 from .errors import (DocumentProcessingError, ERROR_TYPES, ModelsUnavailable,
                      ProcessingMemoryExceeded, ProcessingTimeout, WorkerBusy)
 from .limits import DocumentLimits
+from .resources import available_memory_bytes
 
 
 def _worker_main(connection, limits, model_root, config=None, lock_path=None):
@@ -148,10 +149,11 @@ class LocalDocumentWorker:
                 try:
                     rss = monitor.memory_info().rss
                     self.last_peak_rss_bytes = max(self.last_peak_rss_bytes, rss)
-                    if rss > self.limits.max_worker_rss_bytes or psutil.virtual_memory().available < self.limits.min_host_available_bytes:
+                    if rss > self.limits.max_worker_rss_bytes or available_memory_bytes() < self.limits.min_host_available_bytes:
                         self._stop()
                         raise ProcessingMemoryExceeded()
                 except psutil.NoSuchProcess:
+                    self._stop()
                     raise DocumentProcessingError() from None
                 if self._ready and not sent:
                     self._connection.send((data, kind))
