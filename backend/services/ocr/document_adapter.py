@@ -50,7 +50,8 @@ def _image(data, kind, predict, limits):
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
-            with Image.open(BytesIO(data)) as source:
+            formats = ['JPEG', 'MPO'] if kind == 'jpeg' else [kind.upper()]
+            with Image.open(BytesIO(data), formats=formats) as source:
                 source_format = source.format.lower()
                 if source_format != kind and not (kind == "jpeg" and source_format == "mpo"):
                     raise InvalidDocument()
@@ -60,7 +61,7 @@ def _image(data, kind, predict, limits):
                     raise InvalidDocument()
                 width, height = source.size
                 source.verify()
-            with Image.open(BytesIO(data)) as source:
+            with Image.open(BytesIO(data), formats=formats) as source:
                 source.load()
                 if source.mode == "RGB":
                     bgr_bytes = source.tobytes("raw", "BGR")

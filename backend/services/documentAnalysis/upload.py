@@ -6,7 +6,10 @@ from services.ocr.worker import get_document_worker
 
 def analyze_uploaded_document(uploaded_file):
     worker = get_document_worker()
-    data, kind = read_validated_upload(uploaded_file, worker.limits)
+    try:
+        data, kind = read_validated_upload(uploaded_file, worker.limits)
+    finally:
+        uploaded_file.close()
     result = worker.analyze(data, kind)
     # Aliases preserve useful legacy fields without inventing urgency or advice.
     return DocumentUploadResultSchema.model_validate({

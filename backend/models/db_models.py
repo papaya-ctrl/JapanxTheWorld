@@ -23,6 +23,7 @@ class Document(models.Model):
         app_label = "models"
         db_table = "documents"
         ordering = ["-created_at"]
+        permissions = [("analyze_document", "Can analyze uploaded documents")]
 
     def __str__(self):
         return f"Document #{self.id} ({self.original_filename or 'text-input'})"
@@ -70,6 +71,7 @@ class ChecklistItem(models.Model):
         related_name="checklist_items",
     )
     title = models.CharField(max_length=255)
+    category = models.CharField(max_length=100, blank=True, default="")
     due_date = models.DateField(null=True, blank=True)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

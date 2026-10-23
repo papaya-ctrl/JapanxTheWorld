@@ -47,6 +47,7 @@ class DocumentUploadMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        handler = None
         if request.path.rstrip("/") == "/api/documents/analyze":
             from django.conf import settings
             maximum = DocumentLimits(**getattr(settings, "DOCUMENT_ANALYSIS_LIMITS", {})).max_file_bytes
@@ -56,8 +57,13 @@ class DocumentUploadMiddleware:
                 return JsonResponse({"code": "INVALID_REQUEST", "message": "Invalid request length."}, status=400)
             if length > maximum + 64 * 1024:
                 return JsonResponse({"code": "FILE_TOO_LARGE", "message": "The upload exceeds the request size limit."}, status=413)
-            request.upload_handlers = [BoundedDocumentUpload(request, maximum)]
-        response = self.get_response(request)
+            handler = BoundedDocumentUpload(request, maximum)
+            request.upload_handlers = [handler]
+        try:
+            response = self.get_response(request)
+        finally:
+            if handler and handler.buffer is not None:
+                handler.buffer.close()
         if request.path.rstrip("/") == "/api/documents/analyze":
             response["Cache-Control"] = "no-store"
             response["Pragma"] = "no-cache"

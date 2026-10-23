@@ -1,0 +1,12 @@
+# Install as /etc/nginx/snippets/jxtw-headers.conf, alongside nginx.conf.example.
+# The exact frontend origin is defined by the map in that main example.
+add_header X-Content-Type-Options nosniff always;
+add_header Referrer-Policy no-referrer always;
+add_header X-Frame-Options DENY always;
+add_header Strict-Transport-Security 'max-age=3600' always;
+add_header Cache-Control no-store always;
+add_header Access-Control-Allow-Origin $jxtw_origin always;
+add_header Access-Control-Allow-Methods 'GET, POST, PATCH, DELETE, OPTIONS' always;
+add_header Access-Control-Allow-Headers 'Authorization, Content-Type, X-CSRFToken' always;
+add_header Access-Control-Expose-Headers 'Retry-After' always;
+add_header Vary Origin always;

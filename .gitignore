@@ -7,8 +7,17 @@ __pycache__/
 db.sqlite3
 .env
 backend/.env
+.env.local
+.env.*.local
+backend/.env.*
+!backend/.env.production.example
+backend/staticfiles/
 
 # Frontend
 node_modules/
 dist/
 .DS_Store
+
+# Production secrets
+.env.production
+backend/.env.production

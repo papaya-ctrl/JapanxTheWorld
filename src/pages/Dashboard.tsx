@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { getAuthSession, subscribeToAuth } from "../api/auth";
 import {
   createChecklistItem,
   deleteChecklistItem,
@@ -20,6 +21,7 @@ const initialForm: ChecklistCreateInput = {
 };
 
 export function Dashboard() {
+  const account = useSyncExternalStore(subscribeToAuth, getAuthSession, () => null);
   const [status, setStatus] = useState<UiStatus>("loading");
   const [items, setItems] = useState<ChecklistItemType[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,6 +34,8 @@ export function Dashboard() {
 
     const loadChecklist = async () => {
       setStatus("loading");
+      setItems([]);
+      setForm(initialForm);
 
       try {
         const nextItems = await getChecklist();
@@ -57,7 +61,7 @@ export function Dashboard() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [account]);
 
   const completion = useMemo(() => {
     const completed = items.filter((item) => item.completed).length;

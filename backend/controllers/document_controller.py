@@ -1,5 +1,5 @@
 from django.core.exceptions import RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent
-from rest_framework.decorators import api_view, parser_classes, throttle_classes
+from rest_framework.decorators import api_view, authentication_classes, parser_classes, permission_classes, throttle_classes
 from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -7,6 +7,9 @@ from rest_framework.throttling import SimpleRateThrottle
 
 from services.documentAnalysis.upload import analyze_uploaded_document
 from services.ocr.errors import DocumentProcessingError
+from security.permissions import DocumentAccess
+from security.throttling import DocumentUserThrottle
+from rest_framework.permissions import AllowAny
 
 
 def error_response(code, message, http_status):
@@ -24,17 +27,30 @@ class DocumentAnalysisThrottle(SimpleRateThrottle):
         return getattr(settings, "DOCUMENT_ANALYSIS_RATE", "6/min")
 
     def get_cache_key(self, request, view):
-        return self.cache_format % {"scope": self.scope, "ident": request.META.get("REMOTE_ADDR", "unknown")}
+        from django.conf import settings
+        if getattr(settings, 'ATOMIC_RATE_LIMITING', False):
+            return None
+        return self.cache_format % {"scope": self.scope, "ident": getattr(request._request, 'client_ip', 'unknown')}
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def health_check(request):
     return Response({"status": "ok"})
 
 
+@api_view(['GET'])
+@permission_classes([DocumentAccess])
+def document_access_check(request):
+    """Proxy authorization subrequest: no upload parsing, worker or user payload."""
+    return Response(status=204, headers={'Cache-Control': 'no-store'})
+
+
 @api_view(['POST'])
 @parser_classes([JSONParser, MultiPartParser, FormParser])
-@throttle_classes([DocumentAnalysisThrottle])
+@permission_classes([DocumentAccess])
+@throttle_classes([DocumentAnalysisThrottle, DocumentUserThrottle])
 def analyze_document(request):
     try:
         # Parsing first triggers the endpoint-specific bounded upload handler.

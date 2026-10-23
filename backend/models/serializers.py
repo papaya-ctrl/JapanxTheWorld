@@ -2,11 +2,12 @@ from rest_framework import serializers
 from models.db_models import ChecklistItem
 
 class ChecklistItemSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=True)
     dueDate = serializers.DateField(source='due_date', required=False, allow_null=True)
 
     class Meta:
         model = ChecklistItem
-        fields = ['id', 'title', 'dueDate', 'completed', 'created_at']
+        fields = ['id', 'title', 'category', 'dueDate', 'completed', 'created_at']
         read_only_fields = ['id', 'created_at']
 
     def to_representation(self, instance):

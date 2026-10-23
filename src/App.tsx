@@ -1,4 +1,5 @@
 import { AnalysisSessionProvider } from "./context/AnalysisSession";
+import { AccountAccess } from "./components/AccountAccess";
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { Footer } from "./components/Footer";
 import { Navbar } from "./components/Navbar";
@@ -25,6 +26,7 @@ function AppLayout() {
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.12),_transparent_35%),linear-gradient(180deg,_#f8fbff_0%,_#ffffff_50%,_#f8fafc_100%)] text-slate-900">
       <Navbar links={navLinks} />
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <AccountAccess />
         <Outlet />
       </main>
       <Footer />

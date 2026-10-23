@@ -1,0 +1,44 @@
+# Install only after replacing paths, verifying Linux dependencies and completing
+# docs/16_production_preparation.md. This file does not deploy anything itself.
+[Unit]
+Description=JapanxTheWorld API and local OCR
+After=network.target
+
+[Service]
+Type=simple
+User=jxtw
+Group=jxtw
+WorkingDirectory=/srv/japanxtheworld
+EnvironmentFile=/etc/japanxtheworld/backend.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+Environment=TMPDIR=/var/lib/japanxtheworld/tmp
+Environment=HOME=/var/lib/japanxtheworld
+ExecStartPre=/srv/japanxtheworld/backend/.venv/bin/python backend/manage.py check --deploy --settings=config.settings_production
+ExecStartPre=/srv/japanxtheworld/backend/.venv/bin/python backend/manage.py migrate --check --settings=config.settings_production
+ExecStart=/srv/japanxtheworld/backend/.venv/bin/gunicorn --config deploy/gunicorn.conf.py config.wsgi:application
+TimeoutStopSec=170
+KillMode=control-group
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/japanxtheworld
+ReadOnlyPaths=/var/lib/japanxtheworld/models
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+# Provisional whole-service budgets, NOT validated Linux minimums.
+# Includes Django, threads and the native child; the OCR child retains its 5 GiB guard.
+MemoryHigh=6G
+MemoryMax=6500M
+TasksMax=96
+LimitNOFILE=1024
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

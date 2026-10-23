@@ -181,6 +181,9 @@ class LocalDocumentWorker:
         finally:
             self.last_elapsed_seconds = time.monotonic() - started
             self._lock.release()
+            import logging
+            logging.getLogger('operations').info('ocr', extra={'event':'ocr', 'route':'ocr',
+                'durationSeconds':self.last_elapsed_seconds, 'peakRssMiB':self.last_peak_rss_bytes/1024**2})
 
     def close(self):
         with self._lock:

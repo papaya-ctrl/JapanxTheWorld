@@ -127,12 +127,16 @@ Set `VITE_USE_MOCK_API=true` explicitly to use demo mode. Use `VITE_MOCK_API_SCE
 - AI behavior and backend handoff docs complete
 - Live Document Decoder integration complete (Step 8)
 - Local OCR comparison, bounded worker lifecycle and private accuracy evaluation implemented (Step 9)
+- Production settings, authorized OCR, private checklist access and deployment preparation implemented (Step 10)
 - No paid AI service required for document uploads
-- Broader document evaluation and production hardening pending
+- Public deployment remains NO-GO pending operational setup and broader evaluation
 
 See the [Step 9 benchmark report](docs/15_ocr_optimization_benchmark.md) for measured
 memory/latency, rejected model choices, accuracy limits and initial hosting costs,
 and the [backend evaluation guide](backend/evaluation/README.md) for reproduction.
+Production setup and remaining gates are in the [preparation guide](docs/16_production_preparation.md),
+[readiness report](docs/17_production_readiness_report.md) and
+[privacy draft](docs/18_privacy_retention_draft.md).
 
 ## Privacy / AI Disclaimer
 
@@ -142,7 +146,7 @@ JapanxTheWorld is a support tool. Extracted results and trusted guidance do not 
 
 - Live `POST /api/documents/analyze` integrated with the Document Decoder
 - Backend implements real Life Guides, Official Resources, and Checklist APIs
-- Backend adds authentication if needed
+- Validate authorized accounts, migrations and Linux/proxy operations before hosting
 - Expand evaluation to 30–50 independently annotated real documents and validate Linux deployment
 - Live mode is the default; use explicit mock mode only for demos/tests
 - Full end-to-end QA after backend integration
@@ -166,11 +170,10 @@ npm run preview
 
 ## Deployment
 
-The mock-mode frontend is ready for static deployment.
-
-For Vercel:
-
-1. Set `VITE_USE_MOCK_API=true` for a standalone demo.
-2. Set `VITE_API_BASE_URL` later when the backend is deployed.
-3. Use the default build command: `npm run build`.
-4. Use the output directory: `dist`.
+No application was deployed by Step 10. For a future Vercel frontend, production
+requires a separate HTTPS Python backend URL, `VITE_USE_MOCK_API=false`,
+`VITE_REQUIRE_AUTH=true`, matching CSP/CORS origins, build `npm run build` and output
+`dist`. Never put account tokens or backend secrets in `VITE_` variables. The build
+fails if the Vercel backend/CSP configuration is incomplete. Use the
+[production preparation guide](docs/16_production_preparation.md) rather than a
+development server for public hosting. OCR remains on the Linux backend.

@@ -1,9 +1,14 @@
 import type { ApiError } from "../types";
+import { authorizationHeader, clearAuthSession, getAuthRevision, requireSameAccount } from "./auth";
 
 // Backend processing permits 120 seconds; reserve additional upload/network time.
 export const DOCUMENT_REQUEST_TIMEOUT_MS = 150_000;
 let pending = false;
 const messages: Record<string, string> = {
+  AUTH_REQUIRED: "Sign in again to analyze documents.",
+  ACCESS_DENIED: "Document analysis access has not been granted. Contact the administrator.",
+  RATE_LIMITED: "Too many requests. Please wait before trying again.",
+  SERVICE_BUSY: "The server is unavailable. Please try again later.",
   EMPTY_FILE: "This file is empty. Please choose another file.",
   INVALID_REQUEST: "Please upload one document in a supported format.",
   UNSUPPORTED_FILE_TYPE: "Please upload a JPEG, PNG, WebP, or PDF file.",
@@ -31,19 +36,26 @@ function retryAfter(response: Response): number | undefined {
 export async function postDocument(baseURL: string, file: File): Promise<unknown> {
   if (pending) throw { code: "ANALYSIS_BUSY", message: messages.ANALYSIS_BUSY } satisfies ApiError;
   pending = true;
+  const revision = getAuthRevision();
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), DOCUMENT_REQUEST_TIMEOUT_MS);
   try {
     const body = new FormData();
     body.append("file", file, file.name);
+    const authorization = authorizationHeader();
     const response = await fetch(`${baseURL.replace(/\/$/, "")}/documents/analyze`, {
       method: "POST", body, signal: controller.signal, cache: "no-store",
+      credentials: "omit", referrerPolicy: "no-referrer",
+      headers: authorization ? { Authorization: authorization } : undefined,
     });
     if (!response.ok) {
+      if (response.status === 401 && revision === getAuthRevision()) clearAuthSession();
       const payload: unknown = await response.json().catch(() => null);
       const backendCode = payload && typeof payload === "object" && "code" in payload && typeof payload.code === "string" ? payload.code : undefined;
       const code = backendCode && messages[backendCode] ? backendCode : `HTTP_${response.status}`;
       const fallback = response.status === 429 ? "Too many requests. Please wait before trying again."
+        : response.status === 401 ? messages.AUTH_REQUIRED
+        : response.status === 403 ? messages.ACCESS_DENIED
         : response.status === 503 ? "The server is unavailable. Please try again later."
         : response.status === 504 ? messages.ANALYSIS_TIMEOUT
         : response.status === 413 ? messages.DOCUMENT_LIMIT_EXCEEDED
@@ -51,8 +63,11 @@ export async function postDocument(baseURL: string, file: File): Promise<unknown
         : "Document analysis failed. Please try again later.";
       throw { code, message: messages[code] ?? fallback, status: response.status, retryAfterSeconds: retryAfter(response) } satisfies ApiError;
     }
-    try { return await response.json(); }
+    let result: unknown;
+    try { result = await response.json(); }
     catch { throw { code: "MALFORMED_ANALYSIS", message: "The analysis result could not be displayed safely. Please try again." } satisfies ApiError; }
+    requireSameAccount(revision);
+    return result;
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && typeof error.code === "string" && "message" in error && typeof error.message === "string") throw error;
     throw {

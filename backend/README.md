@@ -1,4 +1,4 @@
-# JapanxTheWorld backend: Steps 7–9
+# JapanxTheWorld backend: Steps 7–10
 
 `POST /api/documents/analyze` now uses local PP-OCRv6 Medium and the existing
 Step 6 deterministic field engine. It does not call a template builder, classify
@@ -9,9 +9,8 @@ authentication, guide, resource, and checklist routes remain in place.
 
 The existing `backend/.venv` is supported. Dependencies are pinned to the tested
 runtime; the OCR models are installed separately and are not downloaded by requests.
-Django was absent from the OCR virtual environment, so Step 7 adds a tested Django
-5.2 LTS / DRF 3.16 runtime. See the [Django support notes](https://docs.djangoproject.com/en/5.2/releases/5.2/)
-and [DRF compatibility announcement](https://www.django-rest-framework.org/community/3.16-announcement/).
+Django 5.2 LTS is retained; Step 10 updates DRF to 3.18.3 and Pillow to 13.0.0 with
+patched transitive dependencies. See `requirements.txt` for the tested pins.
 
 From the project root:
 
@@ -114,7 +113,7 @@ for rejected Small/hybrid configurations and the limitations of detector resizin
 
 ## Resource and abuse limits
 
-Defaults are in `DOCUMENT_ANALYSIS_LIMITS` in `config/settings.py`:
+Defaults are in `DOCUMENT_ANALYSIS_LIMITS` in `config/settings_base.py`:
 
 | Limit | Default |
 | --- | --- |
@@ -175,8 +174,8 @@ marked `Cache-Control: no-store`; 503 busy/unavailable responses include a short
 Uploads are bounded in memory and are **not** passed to Django's temporary-file
 upload handler. PDFium and Pillow decode byte buffers; no document/debug files are
 written by the pipeline. Native worker stdout/stderr are redirected to the null
-device before loading parsers/models. Only a validated result or an allowlisted
-error code crosses the worker channel. Document names, text, account numbers,
+device before loading parsers/models. Only a validated result, numeric metrics or
+an allowlisted error code crosses the worker channel. Document names, text, account numbers,
 exceptions, and results are not logged by application code.
 
 The old persistence function stores filenames and generated summaries even when
@@ -253,3 +252,30 @@ not a validated cloud minimum. The report includes current official base-price
 examples, measured-throughput limits and deployment caveats. No cloud resources
 were provisioned. Public deployment still requires Linux validation and the
 existing settings/proxy/cache hardening.
+
+## Step 10 production preparation
+
+Development stays explicit in `config.settings_development` (with `config.settings`
+as a compatibility alias). Public WSGI/ASGI startup defaults to
+`config.settings_production`, which rejects missing secrets, hosts, origins and
+private state paths. Production OCR requires an active Django account with
+`models.analyze_document`; registration is closed, tokens expire after one hour,
+and checklists are account-scoped. Local anonymous/demo behavior is confined to
+development settings. Apply migrations only after a private backup; the existing
+local database was not modified during this preparation.
+
+Step 10 adds the missing authtoken app and additive migrations for the OCR permission
+and the frontend's checklist category. Signature/decoder limits remain authoritative;
+filenames must now also have an allowed JPEG/PNG/WebP/PDF suffix. The upload stream
+stays in RAM and is explicitly closed on failures and cancellation. Production
+body/IP/user limits fail closed, independently of the OCR worker lock.
+
+The completed checks are recorded in the [readiness report](../docs/17_production_readiness_report.md):
+133 backend tests, 112 frontend tests/build, dependency/security checks, disposable
+migrations/backup/restore, a bounded native HTTP smoke and local Nginx proxy checks.
+The [production guide](../docs/16_production_preparation.md) contains the environment,
+Gunicorn/systemd/Nginx examples, low-cost sizing, migration and recovery procedures.
+The [privacy draft](../docs/18_privacy_retention_draft.md) identifies retention and
+hosting decisions still required. Public deployment remains NO-GO until operational
+and accuracy gates are completed. No deployment, server purchase, commit or push
+was performed.

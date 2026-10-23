@@ -1,10 +1,12 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from services.trustedContent.topics_data import TRUSTED_TOPICS_DATA
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def guide_list(request):
     """
     GET /api/guides
@@ -15,6 +17,7 @@ def guide_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def guide_detail(request, guide_id: str):
     """
     GET /api/guides/:id

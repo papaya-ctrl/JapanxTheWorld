@@ -28,7 +28,7 @@ def run(manifest_path,output):
     def submit(entry,synchronize=False):
         if synchronize:barrier.wait(timeout=10)
         response=APIClient().post("/api/documents/analyze",{
-            "file":SimpleUploadedFile("document",Path(entry["path"]).read_bytes(),content_type="application/octet-stream")},format="multipart")
+            "file":SimpleUploadedFile("document"+Path(entry["path"]).suffix,Path(entry["path"]).read_bytes(),content_type="application/octet-stream")},format="multipart")
         result={"documentId":entry["id"],"httpStatus":response.status_code}
         if response.status_code==200:
             metrics=score_result(response.json(),entry["groundTruth"])

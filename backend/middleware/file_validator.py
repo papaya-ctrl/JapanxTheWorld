@@ -1,9 +1,11 @@
-"""Bounded upload reads and content-signature checks, independent of filenames."""
+"""Bounded reads, extension allowlist and authoritative content-signature checks."""
+from pathlib import Path
 from services.ocr.errors import InvalidDocument, DocumentLimitExceeded
 from services.ocr.limits import DocumentLimits
 
 MAX_FILE_SIZE_BYTES = DocumentLimits().max_file_bytes
 MIME_TYPES = {"jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp", "pdf": "application/pdf"}
+EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.pdf'}
 
 
 def detect_document_kind(data: bytes) -> str:
@@ -21,6 +23,11 @@ def detect_document_kind(data: bytes) -> str:
 def read_validated_upload(uploaded_file, limits: DocumentLimits) -> tuple[bytes, str]:
     if uploaded_file is None:
         raise InvalidDocument()
+    if Path(getattr(uploaded_file, 'name', '') or '').suffix.lower() not in EXTENSIONS:
+        error = InvalidDocument()
+        error.code = 'UNSUPPORTED_FILE_TYPE'
+        error.message = 'Use a JPEG, PNG, WebP, or PDF filename and supported file contents.'
+        raise error
     uploaded_file.seek(0)
     try:
         data = uploaded_file.read(limits.max_file_bytes + 1)

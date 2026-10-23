@@ -14,8 +14,10 @@ import type {
   OfficialResource,
 } from "../types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
-export const isMockApiEnabled = () => import.meta.env.VITE_USE_MOCK_API === "true";
+import { getApiConfiguration } from "./configuration";
+import { authorizationHeader, clearAuthSession, getAuthRevision, requireSameAccount } from "./auth";
+const API_BASE_URL = getApiConfiguration().baseURL;
+export const isMockApiEnabled = () => getApiConfiguration().useMock;
 const MOCK_API_SCENARIO = import.meta.env.VITE_MOCK_API_SCENARIO ?? "success";
 const IS_TEST = import.meta.env.MODE === "test";
 const CHECKLIST_STORAGE_KEY = "japanxtheworld.checklist";
@@ -112,20 +114,31 @@ const fetchJson = async <T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> => {
+  const revision = getAuthRevision();
+  const authorization = authorizationHeader();
   const headers =
     init?.body instanceof FormData
       ? init?.headers
       : {
           "Content-Type": "application/json",
           ...(init?.headers ?? {}),
+          ...(authorization ? { Authorization: authorization } : {}),
         };
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers,
+    credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer",
   });
 
   if (!response.ok) {
+    if (response.status === 401 && revision === getAuthRevision()) clearAuthSession();
+    if (response.status === 401 || response.status === 403 || response.status === 429 || response.status >= 500) {
+      throw createApiError(`HTTP_${response.status}`, response.status === 401 ? "Sign in again to continue."
+        : response.status === 403 ? "You do not have access to this action."
+        : response.status === 429 ? "Too many requests. Please wait before trying again."
+        : "The server is unavailable. Please try again later.");
+    }
     let errorBody: ApiError | null = null;
 
     try {
@@ -143,7 +156,9 @@ const fetchJson = async <T>(
     );
   }
 
-  return (await response.json()) as T;
+  const data = (await response.json()) as T;
+  requireSameAccount(revision);
+  return data;
 };
 
 const hasAnalyzeInput = (request: DocumentAnalysisRequest) =>

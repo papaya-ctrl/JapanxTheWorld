@@ -1,4 +1,5 @@
-import { createContext, type ReactNode, useContext, useEffect, useRef } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AUTH_SESSION_EVENT } from "../api/auth";
 import type { DocumentAnalysisResult } from "../types";
 
 type Session = {
@@ -11,6 +12,7 @@ const Context = createContext<Session | null>(null);
 /** Only an opaque id enters navigation history. All extracted data stays in RAM. */
 export function AnalysisSessionProvider({ children }: { children: ReactNode }) {
   const current = useRef<{ id: string; result: DocumentAnalysisResult } | null>(null);
+  const [revision, setRevision] = useState(0);
   const session = useRef<Session>({
     put(result) {
       const id = crypto.randomUUID();
@@ -30,9 +32,12 @@ export function AnalysisSessionProvider({ children }: { children: ReactNode }) {
       const { result: _discarded, ...usr } = state.usr;
       window.history.replaceState({ ...state, usr }, "");
     }
-    return () => { current.current = null; };
+    const clearForAccountChange = () => { current.current = null; setRevision(value => value + 1); };
+    window.addEventListener(AUTH_SESSION_EVENT, clearForAccountChange);
+    return () => { current.current = null; window.removeEventListener(AUTH_SESSION_EVENT, clearForAccountChange); };
   }, []);
-  return <Context.Provider value={session.current}>{children}</Context.Provider>;
+  const contextValue = useMemo(() => ({ ...session.current }), [revision]);
+  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 }
 export function useAnalysisSession() {
   const value = useContext(Context);

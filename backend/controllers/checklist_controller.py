@@ -1,11 +1,13 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from models.db_models import ChecklistItem
 from models.serializers import ChecklistItemSerializer
+from security.permissions import ChecklistAccess
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([ChecklistAccess])
 def checklist_list_create(request):
     is_authed = bool(request.user and request.user.is_authenticated)
 
@@ -26,6 +28,7 @@ def checklist_list_create(request):
 
 
 @api_view(['PATCH', 'DELETE'])
+@permission_classes([ChecklistAccess])
 def checklist_detail_update_delete(request, pk):
     is_authed = bool(request.user and request.user.is_authenticated)
     try:

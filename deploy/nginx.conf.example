@@ -1,0 +1,207 @@
+# Include inside nginx's http {} block. Replace example.invalid, certificate and
+# static paths. Requires http_auth_request_module. Validate with nginx -t first.
+# No request URLs, client IPs, headers, bodies or query strings enter these logs.
+log_format jxtw_metrics '$status $request_time $upstream_response_time';
+error_log /dev/null crit;
+map $http_origin $jxtw_origin {
+    default '';
+    'https://app.example.invalid' $http_origin;
+}
+limit_req_zone $binary_remote_addr zone=jxtw_api_ip:1m rate=1r/s;
+limit_req_zone $binary_remote_addr zone=jxtw_auth_ip:1m rate=5r/m;
+limit_req_zone $binary_remote_addr zone=jxtw_ocr_ip:1m rate=12r/m;
+limit_conn_zone $server_name zone=jxtw_ocr_active:1m;
+
+server {
+    listen 80 default_server;
+    server_name _;
+    access_log off;
+    return 444;
+}
+server {
+    listen 80;
+    server_name api.example.invalid;
+    access_log off;
+    location /.well-known/acme-challenge/ { root /var/lib/letsencrypt; }
+    location / { return 308 https://api.example.invalid$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name api.example.invalid;
+    ssl_certificate /etc/letsencrypt/live/api.example.invalid/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.invalid/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_tickets off;
+    server_tokens off;
+    access_log /var/log/nginx/jxtw-metrics.log jxtw_metrics;
+    # Nginx error logs cannot be given an allowlist formatter; suppress them to
+    # avoid URLs, IPs, malformed headers or query values leaking on error paths.
+    # Retain numeric access metrics and service/health/OS monitoring instead.
+    error_log /dev/null crit;
+    client_max_body_size 1m;
+    client_header_buffer_size 1k;
+    large_client_header_buffers 2 4k;
+    client_header_timeout 10s;
+    client_body_timeout 15s;
+    client_body_temp_path /var/lib/nginx/jxtw-body;
+    send_timeout 15s;
+    keepalive_timeout 5s;
+    reset_timedout_connection on;
+    limit_req_status 429;
+    limit_conn_status 503;
+    include /etc/nginx/snippets/jxtw-headers.conf;
+    proxy_hide_header Access-Control-Allow-Origin;
+    proxy_hide_header Access-Control-Expose-Headers;
+    if ($host != api.example.invalid) { return 444; }
+    # Preflight carries no token value and must finish before auth_request.
+    if ($request_method = OPTIONS) { return 204; }
+    error_page 400 = @gateway_400;
+    error_page 401 = @gateway_401;
+    error_page 403 = @gateway_403;
+    error_page 404 = @gateway_404;
+    error_page 405 = @gateway_405;
+    error_page 408 = @gateway_408;
+    error_page 411 = @gateway_411;
+    error_page 413 = @gateway_413;
+    error_page 429 = @gateway_429;
+    error_page 500 = @gateway_500;
+    error_page 502 = @gateway_502;
+    error_page 503 = @gateway_503;
+    error_page 504 = @gateway_504;
+
+    # Discard forwarded identity supplied by the public client. Gunicorn binds
+    # only to loopback; Django trusts these fields only from that exact peer.
+    proxy_set_header Host api.example.invalid;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-For '';
+    proxy_set_header X-Forwarded-Host '';
+    proxy_set_header Forwarded '';
+    proxy_connect_timeout 3s;
+    proxy_read_timeout 150s;
+    proxy_send_timeout 30s;
+    proxy_next_upstream off;  # Never automatically duplicate an OCR POST.
+    proxy_buffering off;
+    proxy_request_buffering on;
+    proxy_cache off;
+
+    location = /_authorize_ocr {
+        internal;
+        proxy_pass http://127.0.0.1:8000/api/documents/access;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length '';
+        # proxy_set_header directives do not inherit individually: repeat every
+        # trusted header here to prevent a client-supplied identity bypass.
+        proxy_set_header Host api.example.invalid;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For '';
+        proxy_set_header X-Forwarded-Host '';
+        proxy_set_header Forwarded '';
+    }
+    location = /api/documents/access { return 404; }
+    location = /api/documents/analyze {
+        auth_request /_authorize_ocr;
+        limit_except POST { deny all; }
+        limit_req zone=jxtw_ocr_ip burst=1 nodelay;
+        limit_conn jxtw_ocr_active 1;  # Zero waiting capacity; includes body receipt.
+        client_max_body_size 10304k;  # 10 MiB document + 64 KiB multipart overhead.
+        client_body_buffer_size 11m;  # Bounded body stays in RAM, not an upload file.
+        proxy_pass http://127.0.0.1:8000;
+    }
+    location /api/auth/ {
+        limit_req zone=jxtw_auth_ip burst=2 nodelay;
+        client_max_body_size 64k;
+        client_body_buffer_size 64k;
+        proxy_pass http://127.0.0.1:8000;
+    }
+    location /api/ {
+        limit_req zone=jxtw_api_ip burst=5 nodelay;
+        client_max_body_size 64k;
+        client_body_buffer_size 64k;
+        proxy_pass http://127.0.0.1:8000;
+    }
+    location /admin/ {
+        # Initial production policy: use a loopback SSH tunnel for administration.
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+        client_max_body_size 64k;
+        proxy_pass http://127.0.0.1:8000;
+    }
+    location /static/ {
+        alias /srv/japanxtheworld-static/;
+        autoindex off;
+    }
+    location / { return 404; }
+    location @gateway_400 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 400 '{"code":"INVALID_REQUEST","message":"The gateway could not read the request."}';
+    }
+    location @gateway_401 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        add_header WWW-Authenticate Token always;
+        return 401 '{"code":"AUTH_REQUIRED","message":"Sign in again to continue."}';
+    }
+    location @gateway_403 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 403 '{"code":"ACCESS_DENIED","message":"You do not have access to this action."}';
+    }
+    location @gateway_404 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 404 '{"code":"NOT_FOUND","message":"The requested endpoint was not found."}';
+    }
+    location @gateway_405 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 405 '{"code":"METHOD_NOT_ALLOWED","message":"This request method is not supported."}';
+    }
+    location @gateway_408 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 408 '{"code":"REQUEST_TIMEOUT","message":"The upload timed out."}';
+    }
+    location @gateway_411 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 411 '{"code":"LENGTH_REQUIRED","message":"A bounded request length is required."}';
+    }
+    location @gateway_413 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 413 '{"code":"FILE_TOO_LARGE","message":"The upload exceeds the size limit."}';
+    }
+    location @gateway_429 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        add_header Retry-After 5 always;
+        return 429 '{"code":"RATE_LIMITED","message":"Too many requests. Please wait before trying again."}';
+    }
+    location @gateway_500 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        return 500 '{"code":"INTERNAL_ERROR","message":"The request could not be completed."}';
+    }
+    location @gateway_502 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        add_header Retry-After 5 always;
+        return 502 '{"code":"SERVICE_BUSY","message":"The backend is unavailable."}';
+    }
+    location @gateway_503 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        add_header Retry-After 5 always;
+        return 503 '{"code":"SERVICE_BUSY","message":"The gateway is busy. Please wait before retrying."}';
+    }
+    location @gateway_504 {
+        include /etc/nginx/snippets/jxtw-headers.conf;
+        default_type application/json;
+        add_header Retry-After 5 always;
+        return 504 '{"code":"ANALYSIS_TIMEOUT","message":"The backend response timed out. Please wait before submitting again."}';
+    }
+}
