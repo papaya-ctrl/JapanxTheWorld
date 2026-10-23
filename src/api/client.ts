@@ -1,4 +1,3 @@
-import { getMockAnalysisResult } from "../data/mockAnalysis";
 import { mockChecklist } from "../data/mockChecklist";
 import { mockGuideDetailsById, mockGuides } from "../data/mockGuides";
 import { mockResources } from "../data/mockResources";
@@ -9,13 +8,14 @@ import type {
   ChecklistUpdateInput,
   DocumentAnalysisRequest,
   DocumentAnalysisResult,
+  LegacyDocumentAnalysisResult,
   GuideDetail,
   GuideSummary,
   OfficialResource,
 } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
-const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== "false";
+export const isMockApiEnabled = () => import.meta.env.VITE_USE_MOCK_API === "true";
 const MOCK_API_SCENARIO = import.meta.env.VITE_MOCK_API_SCENARIO ?? "success";
 const IS_TEST = import.meta.env.MODE === "test";
 const CHECKLIST_STORAGE_KEY = "japanxtheworld.checklist";
@@ -60,33 +60,9 @@ const writeChecklistStorage = (items: ChecklistItem[]) => {
   }
 };
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
-
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === "string");
-
-export const isDocumentAnalysisResult = (
-  value: unknown,
-): value is DocumentAnalysisResult => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  return (
-    (value.source === "template" || value.source === "ai") &&
-    typeof value.documentType === "string" &&
-    typeof value.summary === "string" &&
-    (typeof value.deadline === "string" || value.deadline === null) &&
-    (value.urgency === "low" ||
-      value.urgency === "important" ||
-      value.urgency === "urgent") &&
-    isStringArray(value.importantPoints) &&
-    isStringArray(value.nextSteps) &&
-    (typeof value.relatedGuide === "string" || value.relatedGuide === null) &&
-    typeof value.officialWarning === "string"
-  );
-};
+export { isDocumentAnalysisResult } from "./documentContract";
+import { isDocumentUploadResult } from "./documentContract";
+import { postDocument } from "./documentUpload";
 
 type MockScenario =
   | "success"
@@ -107,10 +83,10 @@ const scenarioFromRequest = (
   const combinedInput =
     `${request?.documentTypeHint ?? ""} ${request?.documentText ?? ""}`.toLowerCase();
   const scenarioMatch = combinedInput.match(/simulate:([a-z-]+)/);
-  return (scenarioMatch?.[1] as MockScenario | undefined) ?? MOCK_API_SCENARIO;
+  return (scenarioMatch?.[1] as MockScenario | undefined) ?? import.meta.env.VITE_MOCK_API_SCENARIO ?? MOCK_API_SCENARIO;
 };
 
-const createNoDeadlineResult = (): DocumentAnalysisResult => ({
+const createNoDeadlineResult = (): LegacyDocumentAnalysisResult => ({
   source: "ai",
   documentType: "Unknown Official Document",
   summary:
@@ -173,37 +149,11 @@ const fetchJson = async <T>(
 const hasAnalyzeInput = (request: DocumentAnalysisRequest) =>
   Boolean(request.documentText?.trim()) || Boolean(request.documentFile);
 
-const createAnalyzeRequestBody = (request: DocumentAnalysisRequest) => {
-  if (!request.documentFile) {
-    return JSON.stringify({
-      documentText: request.documentText ?? "",
-      documentTypeHint: request.documentTypeHint,
-      sourceLanguageHint: request.sourceLanguageHint,
-    });
-  }
-
-  const formData = new FormData();
-  formData.append("file", request.documentFile.file, request.documentFile.name);
-
-  if (request.documentText?.trim()) {
-    formData.append("documentText", request.documentText.trim());
-  }
-
-  if (request.documentTypeHint) {
-    formData.append("documentTypeHint", request.documentTypeHint);
-  }
-
-  if (request.sourceLanguageHint) {
-    formData.append("sourceLanguageHint", request.sourceLanguageHint);
-  }
-
-  return formData;
-};
-
 export const analyzeDocument = async (
   request: DocumentAnalysisRequest,
 ): Promise<DocumentAnalysisResult> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
+    const { getMockAnalysisResult } = await import("../data/mockAnalysis");
     await delay(900);
     if (!hasAnalyzeInput(request)) {
       throw createApiError(
@@ -258,30 +208,18 @@ export const analyzeDocument = async (
     return getMockAnalysisResult(request);
   }
 
-  if (!hasAnalyzeInput(request)) {
-    throw createApiError(
-      "EMPTY_DOCUMENT",
-      "Please paste document text or choose a supported document file.",
-    );
+  if (!request.documentFile) {
+    throw createApiError("INVALID_REQUEST", "Please choose a supported document file.");
   }
-
-  const result = await fetchJson<unknown>("/documents/analyze", {
-    method: "POST",
-    body: createAnalyzeRequestBody(request),
-  });
-
-  if (!isDocumentAnalysisResult(result)) {
-    throw createApiError(
-      "MALFORMED_ANALYSIS",
-      "The analysis result could not be displayed safely. Please try again.",
-    );
+  const result = await postDocument(API_BASE_URL, request.documentFile.file);
+  if (!isDocumentUploadResult(result)) {
+    throw createApiError("MALFORMED_ANALYSIS", "The analysis result could not be displayed safely. Please try again.");
   }
-
   return result;
 };
 
 export const getGuides = async (): Promise<GuideSummary[]> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay();
     if (MOCK_API_SCENARIO === "empty-guides") {
       return [];
@@ -293,7 +231,7 @@ export const getGuides = async (): Promise<GuideSummary[]> => {
 };
 
 export const getGuideById = async (guideId: string): Promise<GuideDetail> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay();
     const guide = mockGuideDetailsById[guideId];
     if (!guide) {
@@ -306,7 +244,7 @@ export const getGuideById = async (guideId: string): Promise<GuideDetail> => {
 };
 
 export const getResources = async (): Promise<OfficialResource[]> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay();
     if (MOCK_API_SCENARIO === "resources-error") {
       throw createApiError(
@@ -321,7 +259,7 @@ export const getResources = async (): Promise<OfficialResource[]> => {
 };
 
 export const getChecklist = async (): Promise<ChecklistItem[]> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay(250);
     return readChecklistStorage();
   }
@@ -332,7 +270,7 @@ export const getChecklist = async (): Promise<ChecklistItem[]> => {
 export const createChecklistItem = async (
   input: ChecklistCreateInput,
 ): Promise<ChecklistItem> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay(250);
     if (MOCK_API_SCENARIO === "checklist-mutation-error") {
       throw createApiError("CHECKLIST_SAVE_FAILED", "Your task could not be saved.");
@@ -359,7 +297,7 @@ export const updateChecklistItem = async (
   id: string,
   input: ChecklistUpdateInput,
 ): Promise<ChecklistItem> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay(250);
     if (MOCK_API_SCENARIO === "checklist-mutation-error") {
       throw createApiError(
@@ -395,7 +333,7 @@ export const updateChecklistItem = async (
 export const deleteChecklistItem = async (
   id: string,
 ): Promise<{ success: true; id: string }> => {
-  if (USE_MOCK_API) {
+  if (isMockApiEnabled()) {
     await delay(250);
     if (MOCK_API_SCENARIO === "checklist-mutation-error") {
       throw createApiError(

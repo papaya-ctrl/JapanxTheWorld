@@ -1,4 +1,4 @@
-export type AnalysisSource = "template" | "ai";
+export type AnalysisSource = "template" | "ai" | "deterministic";
 
 export type AnalysisUrgency = "low" | "important" | "urgent";
 
@@ -18,8 +18,8 @@ export type DocumentAnalysisRequest = {
   sourceLanguageHint?: string;
 };
 
-export type DocumentAnalysisResult = {
-  source: AnalysisSource;
+export type LegacyDocumentAnalysisResult = {
+  source: "template" | "ai";
   documentType: string;
   summary: string;
   deadline: string | null;
@@ -29,6 +29,64 @@ export type DocumentAnalysisResult = {
   relatedGuide: string | null;
   officialWarning: string;
 };
+
+// Matches backend/models/schemas.py: DocumentUploadResultSchema.
+export type ExtractedField = {
+  label: string;
+  kind: string;
+  status: "verified" | "unverified";
+  reasons: string[];
+  evidenceIds: string[];
+  ocrConfidence: number | null;
+  association: "text_and_geometry" | "none";
+  occurrences: number;
+};
+export type ExtractedDeadline = ExtractedField & { date: string | null };
+export type ExtractedAmount = ExtractedField & { value: number | null; currency: "JPY" };
+export type PageExtractionMethod = "paddleocr" | "pdf_embedded_text";
+export type ExtractionStatus = "verified" | "partial" | "unverified" | "no_fields";
+export type SourceEvidence = {
+  id: string;
+  text: string;
+  confidence: number | null;
+  bbox: [number, number, number, number];
+  polygon: [number, number][] | null;
+  page: number;
+  originalIndex: number;
+  readingOrder: number;
+  extractionMethod: PageExtractionMethod;
+};
+export type ExtractionPage = {
+  page: number;
+  method: PageExtractionMethod;
+  coordinateSystem: "image_pixels" | "rendered_pixels" | "pdf_points";
+  width: number;
+  height: number;
+  auxiliaryFramesSkipped: number;
+};
+export type DocumentUploadResult = {
+  source: "deterministic";
+  extractionMethod: PageExtractionMethod | "mixed";
+  documentType: string | null;
+  summary: string | null;
+  deadline: string | null;
+  urgency: AnalysisUrgency | null;
+  relatedGuide: string | null;
+  officialWarning: string | null;
+  primaryDeadline: string | null;
+  deadlines: ExtractedDeadline[];
+  primaryAmount: number | null;
+  amounts: ExtractedAmount[];
+  importantPoints: string[];
+  nextSteps: string[];
+  evidence: SourceEvidence[];
+  warnings: string[];
+  extractionStatus: ExtractionStatus;
+  documentTypeEvidenceIds: string[];
+  completedPaymentEvidenceIds: string[];
+  pages: ExtractionPage[];
+};
+export type DocumentAnalysisResult = LegacyDocumentAnalysisResult | DocumentUploadResult;
 
 export type TrustedTopicCategory =
   | "city-hall"
@@ -79,7 +137,7 @@ export type TopicClassificationResult = {
   }>;
 };
 
-export type DocumentTemplate = DocumentAnalysisResult & {
+export type DocumentTemplate = LegacyDocumentAnalysisResult & {
   id: string;
   matchKeywords: string[];
   strongMatchKeywords: string[];
@@ -157,11 +215,8 @@ export type ApiError = {
   code: string;
   message: string;
   details?: string[];
+  status?: number;
+  retryAfterSeconds?: number;
 };
 
-export type DocumentInputFormValues = {
-  documentText: string;
-  documentFile?: DocumentFileInput;
-  documentTypeHint?: string;
-  sourceLanguageHint?: string;
-};
+export type DocumentInputFormValues = { documentFile?: DocumentFileInput };

@@ -1,22 +1,30 @@
-from rest_framework.decorators import api_view, parser_classes
+from django.core.exceptions import RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent
+from rest_framework.decorators import api_view, parser_classes, throttle_classes
+from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.throttling import SimpleRateThrottle
 
-from middleware.file_validator import validate_uploaded_file
-from services.ocr.extractor import extract_text_from_file, OCRUnreadableError
-from services.documentAnalysis.analyzer import analyze_document_text
-from services.documentAnalysis.persistence import save_analysis_record
+from services.documentAnalysis.upload import analyze_uploaded_document
+from services.ocr.errors import DocumentProcessingError
 
 
-def error_response(code: str, message: str, http_status: int) -> Response:
-    return Response(
-        {
-            "code": code,
-            "message": message,
-        },
-        status=http_status,
-    )
+def error_response(code, message, http_status):
+    headers = {"Cache-Control": "no-store", "Pragma": "no-cache"}
+    if http_status == 503:
+        headers["Retry-After"] = "2"
+    return Response({"code": code, "message": message}, status=http_status, headers=headers)
+
+
+class DocumentAnalysisThrottle(SimpleRateThrottle):
+    scope = "document_analysis"
+
+    def get_rate(self):
+        from django.conf import settings
+        return getattr(settings, "DOCUMENT_ANALYSIS_RATE", "6/min")
+
+    def get_cache_key(self, request, view):
+        return self.cache_format % {"scope": self.scope, "ident": request.META.get("REMOTE_ADDR", "unknown")}
 
 
 @api_view(['GET'])
@@ -26,61 +34,29 @@ def health_check(request):
 
 @api_view(['POST'])
 @parser_classes([JSONParser, MultiPartParser, FormParser])
+@throttle_classes([DocumentAnalysisThrottle])
 def analyze_document(request):
-    raw_text = request.data.get("text", "")
-    uploaded_file = request.FILES.get("file", None)
-
-    text_str = raw_text.strip() if isinstance(raw_text, str) else ""
-
-    if not text_str and uploaded_file is None:
-        return error_response(
-            code="INVALID_REQUEST",
-            message="Either 'text' or 'file' must be provided.",
-            http_status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    extracted_file_text = ""
-    original_filename = None
-    mime_type = None
-
-    if uploaded_file is not None:
-        is_valid, err_code, err_msg = validate_uploaded_file(uploaded_file)
-        if not is_valid:
-            return error_response(
-                code=err_code,
-                message=err_msg,
-                http_status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        original_filename = uploaded_file.name
-        mime_type = getattr(uploaded_file, "content_type", None)
-
-        try:
-            extracted_file_text = extract_text_from_file(uploaded_file)
-        except OCRUnreadableError:
-            if not text_str:
-                return error_response(
-                    code="OCR_UNREADABLE",
-                    message="The uploaded document could not be read clearly.",
-                    http_status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                )
-
-    combined_text = f"{text_str}\n{extracted_file_text}".strip()
-
     try:
-        result = analyze_document_text(combined_text)
-        # Save metadata & analysis summary to DB (without storing personal raw text)
-        save_analysis_record(
-            analysis_data=result,
-            user=getattr(request, "user", None),
-            original_filename=original_filename,
-            mime_type=mime_type,
-            raw_extracted_text=combined_text,
-        )
-        return Response(result, status=status.HTTP_200_OK)
+        # Parsing first triggers the endpoint-specific bounded upload handler.
+        files = request.FILES
+        upload_error = getattr(request._request, "document_upload_error", None)
+        if upload_error:
+            return error_response(upload_error, "Upload one supported document within the file size limit.",
+                                  413 if upload_error == "FILE_TOO_LARGE" else 400)
+        if len(files.getlist("file")) != 1 or sum(len(files.getlist(k)) for k in files) != 1:
+            return error_response("INVALID_REQUEST", "Upload one document in the 'file' field.", 400)
+        # Extra text and document hints are never used as document evidence.
+        result = analyze_uploaded_document(files["file"])
+        # Uploads and results are deliberately not sent to legacy persistence.
+        return Response(result, headers={"Cache-Control": "no-store", "Pragma": "no-cache"})
+    except DocumentProcessingError as exc:
+        return error_response(exc.code, exc.message, exc.status)
+    except (RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent):
+        return error_response("REQUEST_TOO_LARGE", "The upload exceeds the request limits.", 413)
+    except UnsupportedMediaType:
+        return error_response("UNSUPPORTED_REQUEST_TYPE", "Use a multipart document upload.", 415)
+    except ParseError:
+        return error_response("INVALID_REQUEST", "The upload request could not be read.", 400)
     except Exception:
-        return error_response(
-            code="AI_SERVICE_ERROR",
-            message="An error occurred while analyzing the document. Please try again.",
-            http_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        # Never return/log native OCR exceptions, validation inputs, or traces.
+        return error_response("ANALYSIS_FAILED", "Document analysis failed. Please try again later.", 500)

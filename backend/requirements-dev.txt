@@ -1,0 +1,6 @@
+-r requirements.txt
+# Synthetic PDFs only; runtime PDF decoding uses pypdfium2.
+reportlab==4.5.1
+
+# Explicit one-time official model download utility, never called by the API.
+huggingface-hub==2.2.0

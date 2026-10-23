@@ -1,7 +1,7 @@
 import type {
   AnalysisUrgency,
   DocumentAnalysisRequest,
-  DocumentAnalysisResult,
+  LegacyDocumentAnalysisResult,
   DocumentTemplate,
   TrustedTopic,
 } from "../types";
@@ -45,7 +45,7 @@ const uniqueStrings = (items: string[]) => {
   });
 };
 
-const createUnknownResult = (fileOnly = false): DocumentAnalysisResult => ({
+const createUnknownResult = (fileOnly = false): LegacyDocumentAnalysisResult => ({
   source: "ai",
   documentType: "Unknown Official Document",
   summary: fileOnly
@@ -132,7 +132,7 @@ const createTrustedResult = (
   template: DocumentTemplate | null,
   text: string,
   fileOnly = false,
-): DocumentAnalysisResult => {
+): LegacyDocumentAnalysisResult => {
   const deadline = fileOnly ? null : extractExplicitDeadline(text);
   const documentType = template?.documentType ?? topic.title;
   const deadlinePoint = deadline
@@ -180,7 +180,7 @@ const createFileOnlyDemoResult = (request: DocumentAnalysisRequest) => {
 
 export const getMockAnalysisResult = (
   request: DocumentAnalysisRequest,
-): DocumentAnalysisResult => {
+): LegacyDocumentAnalysisResult => {
   const text = request.documentText?.trim() ?? "";
   const hint = request.documentTypeHint?.trim() ?? "";
 
@@ -201,7 +201,7 @@ export const getMockAnalysisResult = (
   return createTrustedResult(topic, template, combinedInput);
 };
 
-export const mockAnalysisResults: DocumentAnalysisResult[] = [
+export const mockAnalysisResults: LegacyDocumentAnalysisResult[] = [
   getMockAnalysisResult({
     documentText:
       "住民税納税通知書です。納期限は2026年7月31日です。市役所の税務課へ確認してください。",

@@ -3,3 +3,7 @@
 db.sqlite3
 __pycache__/
 *.pyc
+# Real documents and OCR output contain private information.
+test_documents/
+ocr_private_test/
+ocr_output/

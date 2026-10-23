@@ -1,8 +1,9 @@
+import { formatDocumentDate } from "../lib/documentDates";
 import { Link } from "react-router";
-import type { AnalysisUrgency } from "../types";
+import type { AnalysisSource, AnalysisUrgency, ExtractionStatus } from "../types";
 
 type ResultSourceBadgeProps = {
-  source: "template" | "ai";
+  source: AnalysisSource;
 };
 
 type DeadlineStatusProps = {
@@ -120,18 +121,16 @@ const formatDeadline = (deadline: string | null) => {
     return "No clear deadline detected";
   }
 
-  return new Date(deadline).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatDocumentDate(deadline);
 };
 
 export function ResultSourceBadge({ source }: ResultSourceBadgeProps) {
   const sourceLabel =
-    source === "template" ? "Verified Guide" : "AI-assisted Explanation";
+    source === "deterministic" ? "Local document analysis" : source === "template" ? "Verified Guide" : "AI-assisted Explanation";
   const sourceHelp =
-    source === "template"
+    source === "deterministic"
+      ? "Extracted from your uploaded document"
+      : source === "template"
       ? "Based on JapanxTheWorld trusted content"
       : "Please confirm important details with official sources";
 
@@ -238,4 +237,20 @@ export function RelatedGuideCallout({ guideId }: RelatedGuideCalloutProps) {
       </div>
     </section>
   );
+}
+
+
+const extractionStatuses: Record<ExtractionStatus, { label: string; text: string }> = {
+  verified: { label: "Analysis complete", text: "The extracted facts passed the analyzer's verification checks. Document authenticity is not assessed." },
+  partial: { label: "Partial extraction", text: "Some facts are verified; other fields still need review against the original document." },
+  unverified: { label: "Unverified extraction", text: "The detected fields need verification against the original document." },
+  no_fields: { label: "No supported fields found", text: "No supported document type, deadline, or monetary fields were identified." },
+};
+export function ExtractionStatusBlock({ status }: { status: ExtractionStatus }) {
+  const config = extractionStatuses[status];
+  return <section role="status" aria-label="Extraction status" data-extraction-status={status}
+    className={`max-w-sm rounded-3xl border px-5 py-4 ${status === "verified" ? "border-blue-200 bg-blue-50" : "border-amber-200 bg-amber-50"}`}>
+    <p className="font-semibold text-slate-950">{config.label}</p>
+    <p className="mt-2 text-sm leading-6 text-slate-700">{config.text}</p>
+  </section>;
 }

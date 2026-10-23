@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import App from "./App";
+import { AnalysisResultCard } from "./components/AnalysisResultCard";
 import { analyzeDocument } from "./api/client";
 
 const renderRoute = (route = "/") =>
@@ -13,9 +14,12 @@ const renderRoute = (route = "/") =>
   );
 
 beforeEach(() => {
+  vi.stubEnv("VITE_USE_MOCK_API", "true");
   window.localStorage.clear();
   window.sessionStorage.clear();
 });
+
+afterEach(() => vi.unstubAllEnvs());
 
 describe("JapanxTheWorld app", () => {
   it("renders the home page", () => {
@@ -46,7 +50,7 @@ describe("JapanxTheWorld app", () => {
     await user.click(screen.getByRole("button", { name: "Analyze document" }));
 
     expect(
-      screen.getByText("Please paste document text or choose a supported document file."),
+      screen.getByText("Please choose a supported document file."),
     ).toBeInTheDocument();
   });
 
@@ -54,10 +58,11 @@ describe("JapanxTheWorld app", () => {
     const user = userEvent.setup();
     renderRoute("/document-decoder");
 
-    await user.click(screen.getByRole("button", { name: "Try sample text" }));
+    vi.stubEnv("VITE_MOCK_API_SCENARIO", "trusted-template");
+    await user.upload(screen.getByLabelText("Upload Photo / Document"), new File(["synthetic image"], "residence-tax.png", { type: "image/png" }));
     await user.click(screen.getByRole("button", { name: "Analyze document" }));
 
-    expect(screen.getByText("Analyzing document...")).toBeInTheDocument();
+    expect(screen.getByText(/Uploading and analyzing document/)).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { name: "Residence Tax Notice" }),
     ).toBeInTheDocument();
@@ -167,21 +172,13 @@ describe("JapanxTheWorld app", () => {
 });
 
 describe("Document decoder upload flow", () => {
-  it("supports text-only document submission", async () => {
-    const user = userEvent.setup();
+  it("uses uploads without text or manual hint inputs", () => {
     renderRoute("/document-decoder");
-
-    await user.type(
-      screen.getByRole("textbox", { name: "Document text" }),
-      "国民健康保険料のお知らせです。2026年8月10日までにお支払いください。",
-    );
-    await user.click(screen.getByRole("button", { name: "Analyze document" }));
-
-    expect(
-      await screen.findByRole("heading", {
-        name: "National Health Insurance Notice",
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Upload Photo / Document")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Document text")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Document type hint")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Source language hint")).not.toBeInTheDocument();
+    expect(screen.queryByText("Try sample text")).not.toBeInTheDocument();
   });
 
   it("shows selected image file details", async () => {
@@ -290,7 +287,7 @@ describe("Document decoder upload flow", () => {
     expect(analyzeButton).toBeEnabled();
     await user.click(analyzeButton);
 
-    expect(screen.getByText("Analyzing document...")).toBeInTheDocument();
+    expect(screen.getByText(/Uploading and analyzing document/)).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { name: "Residence Tax Notice" }),
     ).toBeInTheDocument();
@@ -311,51 +308,21 @@ describe("Document result rendering", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders an AI fallback result", () => {
-    window.sessionStorage.setItem(
-      "japanxtheworld.lastAnalysis",
-      JSON.stringify({
-        source: "ai",
-        documentType: "Unknown Official Document",
-        summary: "This document is unclear from the provided text.",
-        deadline: null,
-        urgency: "important",
-        importantPoints: ["The exact purpose is unclear."],
-        nextSteps: ["Confirm with the issuing organization."],
-        relatedGuide: null,
-        officialWarning:
-          "Please confirm important details with official sources.",
-      }),
-    );
-
+  it("discards persisted results from earlier app versions", () => {
+    window.sessionStorage.setItem("japanxtheworld.lastAnalysis", JSON.stringify({ summary: "PRIVATE_OLD_RESULT" }));
     renderRoute("/document-decoder/result");
-
-    expect(screen.getByText("AI-assisted Explanation")).toBeInTheDocument();
-    expect(
-      screen.getByText("No clear deadline detected"),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("note", { name: "Official confirmation warning" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Start with a document first" })).toBeInTheDocument();
+    expect(screen.queryByText("PRIVATE_OLD_RESULT")).not.toBeInTheDocument();
+    expect(window.sessionStorage.getItem("japanxtheworld.lastAnalysis")).toBeNull();
   });
 
-  it("renders urgency badges correctly", () => {
-    window.sessionStorage.setItem(
-      "japanxtheworld.lastAnalysis",
-      JSON.stringify({
-        source: "template",
-        documentType: "Test Notice",
-        summary: "A test summary.",
-        deadline: "2026-12-01",
-        urgency: "urgent",
-        importantPoints: ["Point"],
-        nextSteps: ["Step"],
-        relatedGuide: null,
-        officialWarning: "Confirm with official sources.",
-      }),
-    );
-
-    renderRoute("/document-decoder/result");
-
+  it("retains explicit legacy demo presentation", () => {
+    render(<MemoryRouter><AnalysisResultCard result={{
+      source: "template", documentType: "Test Notice", summary: "A test summary.", deadline: "2026-12-01",
+      urgency: "urgent", importantPoints: ["Point"], nextSteps: ["Step"], relatedGuide: null, officialWarning: "Confirm the source."
+    }} /></MemoryRouter>);
     expect(screen.getByText("Status: Urgent")).toBeInTheDocument();
+    expect(screen.getByText("Demo result · sample explanation")).toBeInTheDocument();
   });
 });
 
@@ -364,10 +331,8 @@ describe("Document decoder error state", () => {
     const user = userEvent.setup();
     renderRoute("/document-decoder");
 
-    await user.type(
-      screen.getByRole("textbox", { name: "Document text" }),
-      "simulate:server-error 市役所からの通知です。",
-    );
+    vi.stubEnv("VITE_MOCK_API_SCENARIO", "server-error");
+    await user.upload(screen.getByLabelText("Upload Photo / Document"), new File(["synthetic pdf"], "document.pdf", { type: "application/pdf" }));
     await user.click(screen.getByRole("button", { name: "Analyze document" }));
 
     const alert = await screen.findByRole("alert");

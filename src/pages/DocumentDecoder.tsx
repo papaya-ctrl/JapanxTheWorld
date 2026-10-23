@@ -1,50 +1,54 @@
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { DocumentInputForm } from "../components/DocumentInputForm";
 import { analyzeDocument } from "../api/client";
-import type { ApiError, DocumentAnalysisResult, DocumentInputFormValues } from "../types";
+import { useAnalysisSession } from "../context/AnalysisSession";
+import type { ApiError, DocumentInputFormValues } from "../types";
 
 const PRIVACY_WARNING =
-  "Do not upload highly sensitive personal information unless you understand how the service will process it. If your document includes private details, confirm whether it is safe to share before submitting.";
+  "Your document is sent to the configured document server for analysis. Uploads and results are not saved by this flow. Results stay available only while this app is open; reloading clears them.";
 
 export function DocumentDecoder() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [lastSubmittedValues, setLastSubmittedValues] =
-    useState<DocumentInputFormValues | null>(null);
+  const session = useAnalysisSession();
+  const busy = useRef(false);
+  const mounted = useRef(true);
+  const [retryAt, setRetryAt] = useState(0);
+  const [remaining, setRemaining] = useState(0);
+  useEffect(() => {
+    mounted.current = true;
+    session.clear();
+    return () => { mounted.current = false; };
+  }, [session]);
+  useEffect(() => {
+    const update = () => setRemaining(Math.max(0, Math.ceil((retryAt - Date.now()) / 1000)));
+    update();
+    if (!retryAt) return;
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [retryAt]);
 
   const handleSubmit = async (values: DocumentInputFormValues) => {
+    if (busy.current || Date.now() < retryAt) return;
+    busy.current = true;
     setIsSubmitting(true);
     setErrorMessage("");
-    setLastSubmittedValues(values);
-
     try {
-      const result: DocumentAnalysisResult = await analyzeDocument(values);
-      window.sessionStorage.setItem(
-        "japanxtheworld.lastAnalysis",
-        JSON.stringify(result),
-      );
-      startTransition(() => {
-        navigate("/document-decoder/result", { state: { result } });
-      });
+      const result = await analyzeDocument(values);
+      if (!mounted.current) return;
+      const analysisId = session.put(result);
+      startTransition(() => navigate("/document-decoder/result", { state: { analysisId } }));
     } catch (error) {
+      if (!mounted.current) return;
       const apiError = error as ApiError;
-      setErrorMessage(
-        apiError.message ||
-          "The analysis could not be completed. Please try again.",
-      );
+      setErrorMessage(apiError.message || "The analysis could not be completed. Please try again later.");
+      if (apiError.retryAfterSeconds) setRetryAt(Date.now() + apiError.retryAfterSeconds * 1000);
     } finally {
-      setIsSubmitting(false);
+      busy.current = false;
+      if (mounted.current) setIsSubmitting(false);
     }
-  };
-
-  const handleRetry = async () => {
-    if (!lastSubmittedValues) {
-      return;
-    }
-
-    await handleSubmit(lastSubmittedValues);
   };
 
   return (
@@ -58,9 +62,8 @@ export function DocumentDecoder() {
             Understand a Japanese document step by step
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-slate-600">
-            Upload a photo, PDF, or paste document text to receive a structured
-            explanation in simple English. The result will show the summary,
-            urgency, important points, and practical next steps.
+            Upload a Japanese document image or PDF to view its supported dates,
+            amounts, and source evidence in English. Uncertain fields stay clearly marked.
           </p>
         </div>
         <div className="rounded-[28px] border border-red-100 bg-red-50 p-5">
@@ -73,7 +76,8 @@ export function DocumentDecoder() {
 
       <DocumentInputForm
         onSubmit={handleSubmit}
-        onRetry={lastSubmittedValues ? handleRetry : undefined}
+        onFileChange={() => setErrorMessage("")}
+        retryAfterSeconds={remaining}
         isSubmitting={isSubmitting}
         errorMessage={errorMessage}
       />

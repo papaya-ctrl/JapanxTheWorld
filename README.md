@@ -2,20 +2,25 @@
 
 JapanxTheWorld helps foreign students and workers in Japan understand difficult Japanese documents, official procedures, and practical next actions.
 
+The Document Decoder now uploads Japanese images/PDFs to the local Django/PaddleOCR
+backend and displays evidence-based English results. See [live decoder setup,
+privacy, tests and limitations](docs/13_document_decoder_live_integration.md) and
+[backend setup](backend/README.md). Explicit mock/demo mode remains available for
+other frontend QA and demonstrations.
+
 ## Problem
 
 Foreign students, workers, and students transitioning into work in Japan can struggle with official documents, city hall procedures, school notices, employment paperwork, and deadline-heavy tasks.
 
 ## Solution
 
-JapanxTheWorld is a structured Japan-specific guidance platform. It uses **Trusted Knowledge First + AI Fallback**:
+The live Document Decoder uses local PaddleOCR or embedded PDF text extraction
+and deterministic Python rules to identify supported fields. It preserves source
+evidence, separates verified and unverified values, and leaves unsupported primary
+fields null. No paid AI API or local LLM is part of this upload workflow.
 
-```txt
-Known document or topic -> trusted JapanxTheWorld content
-Unknown or low-confidence document -> AI fallback explanation
-```
-
-AI supports classification, fact extraction, and fallback explanations. Known procedures should rely on manually maintained trusted content instead of freeform AI generation.
+Life Guides use maintained trusted content. Legacy template/AI-style results
+remain explicit demo fixtures rather than live document facts.
 
 ## Target Users
 
@@ -44,9 +49,9 @@ AI supports classification, fact extraction, and fallback explanations. Known pr
 
 ## Frontend Architecture
 
-The frontend is mock-first and backend-ready. Pages call `src/api/client.ts`, which can return local mock data or call backend endpoints depending on environment variables. The frontend-facing `DocumentAnalysisResult` shape stays the same for trusted template results and AI fallback results.
+Pages call `src/api/client.ts`. Live document uploads use the actual deterministic backend contract; explicit demo mode retains the legacy template/AI simulation contract. Other pages keep their existing API and demo behavior.
 
-The Document Decoder accepts pasted text, JPEG/PNG/WebP images, or PDFs in the frontend prototype. In mock mode, uploaded files let the UI flow be tested, but no OCR or real document reading happens yet. Real file extraction and OCR remain backend-owned.
+The Document Decoder accepts JPEG/PNG/WebP images or PDFs without manual hints. Live mode performs OCR or embedded PDF text extraction in the backend. Explicit demo mode is visibly labeled and does not read uploaded file contents.
 
 ## Project Structure
 
@@ -89,7 +94,7 @@ Open the local URL printed by Vite.
 ## Environment Variables
 
 ```env
-VITE_USE_MOCK_API=true
+VITE_USE_MOCK_API=false
 VITE_API_BASE_URL=http://localhost:8000/api
 VITE_MOCK_API_SCENARIO=success
 ```
@@ -98,7 +103,7 @@ No secrets are required for the frontend prototype. Do not commit API keys, toke
 
 ## Mock Scenarios
 
-Use `VITE_MOCK_API_SCENARIO` or a document hint/text containing `simulate:<scenario>` for frontend QA.
+Set `VITE_USE_MOCK_API=true` explicitly to use demo mode. Use `VITE_MOCK_API_SCENARIO` for frontend QA; legacy text-based simulations remain test helpers and are not active upload-form inputs.
 
 | Scenario | Behavior |
 | --- | --- |
@@ -120,20 +125,26 @@ Use `VITE_MOCK_API_SCENARIO` or a document hint/text containing `simulate:<scena
 - Mock mode complete
 - Trusted knowledge structure complete
 - AI behavior and backend handoff docs complete
-- Backend integration pending
-- Real AI API pending
+- Live Document Decoder integration complete (Step 8)
+- Local OCR comparison, bounded worker lifecycle and private accuracy evaluation implemented (Step 9)
+- No paid AI service required for document uploads
+- Broader document evaluation and production hardening pending
+
+See the [Step 9 benchmark report](docs/15_ocr_optimization_benchmark.md) for measured
+memory/latency, rejected model choices, accuracy limits and initial hosting costs,
+and the [backend evaluation guide](backend/evaluation/README.md) for reproduction.
 
 ## Privacy / AI Disclaimer
 
-JapanxTheWorld is a support tool. AI output and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.
+JapanxTheWorld is a support tool. Extracted results and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.
 
 ## Roadmap
 
-- Backend implements real `POST /api/documents/analyze`
+- Live `POST /api/documents/analyze` integrated with the Document Decoder
 - Backend implements real Life Guides, Official Resources, and Checklist APIs
 - Backend adds authentication if needed
-- Backend connects OCR/file handling, multipart document upload, and real AI provider logic
-- Frontend switches `VITE_USE_MOCK_API=false` after APIs are ready
+- Expand evaluation to 30–50 independently annotated real documents and validate Linux deployment
+- Live mode is the default; use explicit mock mode only for demos/tests
 - Full end-to-end QA after backend integration
 
 ## My Role

@@ -1,0 +1,12 @@
+# Python 3.12. Step 7 upload pipeline; no paid AI SDK is required.
+Django==5.2.18
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+python-dotenv==1.2.4
+pydantic==2.14.1
+Pillow==12.1.0
+pypdfium2==5.14.0
+psutil==7.2.2
+paddleocr==3.7.0
+paddlex==3.7.2
+paddlepaddle==3.2.0

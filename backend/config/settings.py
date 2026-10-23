@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'middleware.document_upload.DocumentUploadMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -145,3 +146,28 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
 }
+
+# Document upload protections. Uploads use a bounded in-memory handler; the
+# subprocess supervises native parser/model time and RSS independently.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 256 * 1024
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 20
+DATA_UPLOAD_MAX_NUMBER_FILES = 1
+DOCUMENT_ANALYSIS_RATE = os.getenv("DOCUMENT_ANALYSIS_RATE", "6/min")
+DOCUMENT_ANALYSIS_LIMITS = {
+    "max_file_bytes": 10 * 1024 * 1024,
+    "max_pages": 5,
+    "max_dimension": 8000,
+    "max_page_pixels": 16_000_000,
+    "max_document_pixels": 50_000_000,
+    "timeout_seconds": 120,
+    "max_worker_rss_bytes": 5 * 1024**3,
+}
+DOCUMENT_OCR_MODEL_ROOT = os.getenv("DOCUMENT_OCR_MODEL_ROOT") or None
+
+# No per-request overrides: uploads cannot select a model or infer document type.
+DOCUMENT_OCR_CONFIGURATION = {
+    "detection_size": "medium", "recognition_size": "medium",
+    "recognition_batch_size": 1, "cpu_threads": 4, "detector_side": 1600,
+    "enable_mkldnn": False, "engine": "paddle_static",
+}
+DOCUMENT_OCR_LOCK_PATH = os.getenv("DOCUMENT_OCR_LOCK_PATH") or None

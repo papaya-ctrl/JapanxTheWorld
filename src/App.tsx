@@ -1,3 +1,4 @@
+import { AnalysisSessionProvider } from "./context/AnalysisSession";
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { Footer } from "./components/Footer";
 import { Navbar } from "./components/Navbar";
@@ -33,6 +34,7 @@ function AppLayout() {
 
 export default function App() {
   return (
+    <AnalysisSessionProvider>
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<Home />} />
@@ -46,5 +48,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
+    </AnalysisSessionProvider>
   );
 }

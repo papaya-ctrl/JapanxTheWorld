@@ -1,8 +1,11 @@
+import { formatDocumentDatesInText } from "../lib/documentDates";
+import { ExtractedDocumentFields } from "./ExtractedDocumentFields";
 import type { DocumentAnalysisResult } from "../types";
 import { ImportantPointsList } from "./ImportantPointsList";
 import { NextStepsList } from "./NextStepsList";
 import {
   DeadlineStatus,
+  ExtractionStatusBlock,
   OfficialConfirmationNotice,
   RelatedGuideCallout,
   ResultSourceBadge,
@@ -13,6 +16,7 @@ type AnalysisResultCardProps = {
 };
 
 export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
+  const extracted = result.source === "deterministic";
   return (
     <article className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
       <div className="border-b border-slate-200 bg-gradient-to-r from-blue-50 via-white to-amber-50 px-6 py-6 sm:px-8">
@@ -20,16 +24,18 @@ export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
               <ResultSourceBadge source={result.source} />
+              {!extracted ? <p className="text-sm font-semibold text-amber-900">Demo result · sample explanation</p> : null}
             </div>
             <div>
               <p className="text-sm font-medium text-blue-700">Document type</p>
               <h1 className="mt-1 text-2xl font-semibold text-slate-900 sm:text-3xl">
-                {result.documentType}
+                {result.documentType || "Unknown Document"}
               </h1>
             </div>
           </div>
 
-          <DeadlineStatus deadline={result.deadline} urgency={result.urgency} />
+          {result.source === "deterministic" ? <ExtractionStatusBlock status={result.extractionStatus} />
+            : <DeadlineStatus deadline={result.deadline} urgency={result.urgency} />}
         </div>
       </div>
 
@@ -39,8 +45,17 @@ export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
             What it means
           </p>
           <h2 className="text-xl font-semibold text-slate-950">Summary</h2>
-          <p className="text-sm leading-7 text-slate-700">{result.summary}</p>
+          <p className="text-sm leading-7 text-slate-700">{result.summary ? formatDocumentDatesInText(result.summary) : "No verified summary is available."}</p>
         </section>
+
+        {result.source === "deterministic" ? <>
+          <p className="text-xs text-slate-500">Extraction method: {result.extractionMethod === "paddleocr" ? "Text recognition" : result.extractionMethod === "pdf_embedded_text" ? "Embedded PDF text" : "Text recognition and embedded PDF text"}</p>
+          <ExtractedDocumentFields result={result} />
+          {result.warnings.length ? <section role="note" aria-label="Extraction warnings" className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
+            <h2 className="font-semibold text-amber-950">Review notes</h2>
+            <ul className="mt-2 space-y-2 text-sm leading-6 text-amber-900">{result.warnings.map(w => <li key={w}>{w}</li>)}</ul>
+          </section> : null}
+        </> : null}
 
         <section
           role="region"
@@ -74,7 +89,7 @@ export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
             </div>
           </div>
           <div className="mt-5">
-            <ImportantPointsList items={result.importantPoints} />
+            <ImportantPointsList items={result.importantPoints.map(formatDocumentDatesInText)} />
           </div>
         </section>
 
@@ -84,11 +99,11 @@ export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
           </p>
           <h2 className="mt-1 text-xl font-semibold text-slate-950">Next Steps</h2>
           <div className="mt-5">
-            <NextStepsList steps={result.nextSteps} />
+            <NextStepsList steps={result.nextSteps.map(formatDocumentDatesInText)} />
           </div>
         </section>
 
-        <OfficialConfirmationNotice warning={result.officialWarning} />
+        {result.source !== "deterministic" && result.officialWarning ? <OfficialConfirmationNotice warning={result.officialWarning} /> : null}
 
         {result.relatedGuide ? <RelatedGuideCallout guideId={result.relatedGuide} /> : null}
       </div>
