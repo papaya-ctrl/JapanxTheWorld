@@ -1,5 +1,11 @@
 # Private, reproducible OCR evaluation
 
+Step 12 adds a strict independent-annotation schema, encrypted artifacts, explicit
+precision/recall and failure denominators, frozen OCR replay, and error-stage review.
+Use the [current workflow](../../docs/21_accuracy_evaluation_workflow.md) and
+[measured results](../../docs/22_document_accuracy_report.md) for new evaluation.
+The commands below document the original Step 9 schema and historical comparisons.
+
 Run from the project root using Python 3.12 and `backend/requirements-dev.txt`.
 Evaluation runs local PaddleOCR and deterministic Python, serially, without paid
 AI calls. Never run native profile benchmarks alongside API smoke tests or another

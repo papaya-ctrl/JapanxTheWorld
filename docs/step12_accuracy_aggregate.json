@@ -1,0 +1,3464 @@
+{
+  "schemaVersion": 2,
+  "runs": [
+    {
+      "schemaVersion": 2,
+      "mode": "controlled_ocr",
+      "groups": {
+        "synthetic": {
+          "summary": {
+            "samples": 20,
+            "successful": 20,
+            "failedOrNotExecuted": 0,
+            "scorableSamples": 20,
+            "completeAnnotations": 20,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 0,
+            "pendingKnownDeadlines": 0,
+            "pendingKnownAmounts": 0,
+            "outcomes": {
+              "ok": 20
+            },
+            "deadlines": {
+              "truePositive": 6,
+              "falsePositive": 1,
+              "falseNegative": 1,
+              "precision": {
+                "numerator": 6,
+                "denominator": 7,
+                "value": 0.8571428571428571
+              },
+              "recall": {
+                "numerator": 6,
+                "denominator": 7,
+                "value": 0.8571428571428571
+              },
+              "exactMatch": {
+                "numerator": 18,
+                "denominator": 20,
+                "value": 0.9
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 1,
+                "denominator": 20,
+                "value": 0.05
+              },
+              "knownFieldRecall": {
+                "numerator": 6,
+                "denominator": 7,
+                "value": 0.8571428571428571
+              },
+              "knownFalseNegatives": 1,
+              "labelAssociation": {
+                "numerator": 6,
+                "denominator": 7,
+                "value": 0.8571428571428571
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 4,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 11,
+              "falsePositive": 1,
+              "falseNegative": 1,
+              "precision": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "recall": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "exactMatch": {
+                "numerator": 18,
+                "denominator": 20,
+                "value": 0.9
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 1,
+                "denominator": 20,
+                "value": 0.05
+              },
+              "knownFieldRecall": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "knownFalseNegatives": 1,
+              "labelAssociation": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 3,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 19,
+              "denominator": 20,
+              "value": 0.95
+            },
+            "primaryDeadline": {
+              "numerator": 18,
+              "denominator": 20,
+              "value": 0.9
+            },
+            "primaryAmount": {
+              "numerator": 18,
+              "denominator": 20,
+              "value": 0.9
+            },
+            "extractionStatus": {
+              "numerator": 16,
+              "denominator": 20,
+              "value": 0.8
+            },
+            "uncertainty": {
+              "numerator": 6,
+              "denominator": 8,
+              "value": 0.75
+            },
+            "missingFields": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "eraConversion": {
+              "numerator": 2,
+              "denominator": 3,
+              "value": 0.6666666666666666
+            },
+            "deduplication": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "transcriptionSamples": 0,
+            "characterErrorRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "resources": {
+              "latencySamples": 0,
+              "medianSeconds": null,
+              "p95Seconds": null,
+              "maximumSeconds": null,
+              "rssSamples": 0,
+              "peakRssMiB": null,
+              "warmLatency": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "initialization": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 0,
+            "municipal": 0,
+            "national_health_insurance": 0,
+            "national_pension": 0,
+            "residence_tax": 0,
+            "school": 0,
+            "unassigned": 0,
+            "unknown": 20,
+            "utility": 0
+          }
+        }
+      },
+      "rows": [
+        {
+          "id": "S201",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 1,
+            "unverified": 0,
+            "exact": false
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": false,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": false
+          },
+          "resources": {}
+        },
+        {
+          "id": "S202",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 1,
+            "unverified": 0,
+            "exact": false
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": false,
+            "extractionStatusCorrect": false
+          },
+          "resources": {}
+        },
+        {
+          "id": "S203",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": false,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": false
+          },
+          "resources": {}
+        },
+        {
+          "id": "S204",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": false,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S205",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 1,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": false
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": false,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": false
+          },
+          "resources": {}
+        },
+        {
+          "id": "S206",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S207",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S208",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S209",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 3,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S210",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S211",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 1,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": false
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S212",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S213",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S214",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S215",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S216",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S217",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S218",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S219",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S220",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        }
+      ],
+      "timingOrigin": "no_native_ocr",
+      "publicProductionReady": false
+    },
+    {
+      "schemaVersion": 2,
+      "mode": "controlled_ocr",
+      "groups": {
+        "synthetic": {
+          "summary": {
+            "samples": 20,
+            "successful": 20,
+            "failedOrNotExecuted": 0,
+            "scorableSamples": 20,
+            "completeAnnotations": 20,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 0,
+            "pendingKnownDeadlines": 0,
+            "pendingKnownAmounts": 0,
+            "outcomes": {
+              "ok": 20
+            },
+            "deadlines": {
+              "truePositive": 7,
+              "falsePositive": 0,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 7,
+                "denominator": 7,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 7,
+                "denominator": 7,
+                "value": 1.0
+              },
+              "exactMatch": {
+                "numerator": 20,
+                "denominator": 20,
+                "value": 1.0
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 20,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 7,
+                "denominator": 7,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 7,
+                "denominator": 7,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 4,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 11,
+              "falsePositive": 0,
+              "falseNegative": 1,
+              "precision": {
+                "numerator": 11,
+                "denominator": 11,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "exactMatch": {
+                "numerator": 19,
+                "denominator": 20,
+                "value": 0.95
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 20,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "knownFalseNegatives": 1,
+              "labelAssociation": {
+                "numerator": 11,
+                "denominator": 12,
+                "value": 0.9166666666666666
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 4,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 20,
+              "denominator": 20,
+              "value": 1.0
+            },
+            "primaryDeadline": {
+              "numerator": 20,
+              "denominator": 20,
+              "value": 1.0
+            },
+            "primaryAmount": {
+              "numerator": 20,
+              "denominator": 20,
+              "value": 1.0
+            },
+            "extractionStatus": {
+              "numerator": 20,
+              "denominator": 20,
+              "value": 1.0
+            },
+            "uncertainty": {
+              "numerator": 8,
+              "denominator": 8,
+              "value": 1.0
+            },
+            "missingFields": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "eraConversion": {
+              "numerator": 3,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "deduplication": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "transcriptionSamples": 0,
+            "characterErrorRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "resources": {
+              "latencySamples": 0,
+              "medianSeconds": null,
+              "p95Seconds": null,
+              "maximumSeconds": null,
+              "rssSamples": 0,
+              "peakRssMiB": null,
+              "warmLatency": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "initialization": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 0,
+            "municipal": 0,
+            "national_health_insurance": 0,
+            "national_pension": 0,
+            "residence_tax": 0,
+            "school": 0,
+            "unassigned": 0,
+            "unknown": 20,
+            "utility": 0
+          }
+        }
+      },
+      "rows": [
+        {
+          "id": "S201",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S202",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S203",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S204",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S205",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S206",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S207",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S208",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S209",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 3,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S210",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S211",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 1,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": false
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S212",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S213",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S214",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S215",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S216",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S217",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S218",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S219",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        },
+        {
+          "id": "S220",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {}
+        }
+      ],
+      "timingOrigin": "no_native_ocr",
+      "publicProductionReady": false
+    },
+    {
+      "schemaVersion": 2,
+      "mode": "frozen_step9_ocr_current_engine_replay",
+      "groups": {
+        "synthetic": {
+          "summary": {
+            "samples": 11,
+            "successful": 11,
+            "failedOrNotExecuted": 0,
+            "scorableSamples": 11,
+            "completeAnnotations": 11,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 0,
+            "pendingKnownDeadlines": 0,
+            "pendingKnownAmounts": 0,
+            "outcomes": {
+              "ok": 11
+            },
+            "deadlines": {
+              "truePositive": 13,
+              "falsePositive": 0,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 13,
+                "denominator": 13,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 13,
+                "denominator": 13,
+                "value": 1.0
+              },
+              "exactMatch": {
+                "numerator": 11,
+                "denominator": 11,
+                "value": 1.0
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 11,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 13,
+                "denominator": 13,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 13,
+                "denominator": 13,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 10,
+              "falsePositive": 0,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 10,
+                "denominator": 10,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 10,
+                "denominator": 10,
+                "value": 1.0
+              },
+              "exactMatch": {
+                "numerator": 11,
+                "denominator": 11,
+                "value": 1.0
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 11,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 10,
+                "denominator": 10,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 10,
+                "denominator": 10,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 1,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 11,
+              "denominator": 11,
+              "value": 1.0
+            },
+            "primaryDeadline": {
+              "numerator": 11,
+              "denominator": 11,
+              "value": 1.0
+            },
+            "primaryAmount": {
+              "numerator": 11,
+              "denominator": 11,
+              "value": 1.0
+            },
+            "extractionStatus": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "uncertainty": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "missingFields": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "eraConversion": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "deduplication": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "transcriptionSamples": 11,
+            "characterErrorRate": {
+              "numerator": 40,
+              "denominator": 537,
+              "value": 0.074487895716946
+            },
+            "resources": {
+              "latencySamples": 11,
+              "medianSeconds": 3.2633,
+              "p95Seconds": 6.1071,
+              "maximumSeconds": 6.1071,
+              "rssSamples": 11,
+              "peakRssMiB": 3408.875,
+              "warmLatency": {
+                "samples": 10,
+                "median": 3.2582500000000003,
+                "maximum": 3.9723
+              },
+              "initialization": {
+                "samples": 1,
+                "median": 1.9927659579989268,
+                "maximum": 1.9927659579989268
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 1,
+            "municipal": 1,
+            "national_health_insurance": 2,
+            "national_pension": 1,
+            "residence_tax": 1,
+            "school": 2,
+            "unassigned": 0,
+            "unknown": 1,
+            "utility": 2
+          }
+        },
+        "real_private": {
+          "summary": {
+            "samples": 1,
+            "successful": 1,
+            "failedOrNotExecuted": 0,
+            "scorableSamples": 1,
+            "completeAnnotations": 0,
+            "partialAnnotations": 1,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 0,
+            "pendingKnownDeadlines": 0,
+            "pendingKnownAmounts": 0,
+            "outcomes": {
+              "ok": 1
+            },
+            "deadlines": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 2,
+                "denominator": 2,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 2,
+                "denominator": 2,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 1,
+                "denominator": 1,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 1,
+                "denominator": 1,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 7,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "primaryDeadline": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "primaryAmount": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "extractionStatus": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "uncertainty": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "missingFields": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "eraConversion": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "deduplication": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "transcriptionSamples": 0,
+            "characterErrorRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "resources": {
+              "latencySamples": 1,
+              "medianSeconds": 9.7871,
+              "p95Seconds": 9.7871,
+              "maximumSeconds": 9.7871,
+              "rssSamples": 1,
+              "peakRssMiB": 3650.71875,
+              "warmLatency": {
+                "samples": 1,
+                "median": 9.7871,
+                "maximum": 9.7871
+              },
+              "initialization": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 0,
+            "municipal": 0,
+            "national_health_insurance": 1,
+            "national_pension": 0,
+            "residence_tax": 0,
+            "school": 0,
+            "unassigned": 0,
+            "unknown": 0,
+            "utility": 0
+          }
+        }
+      },
+      "rows": [
+        {
+          "id": "S001",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3541123072,
+            "elapsedSeconds": 6.1071
+          }
+        },
+        {
+          "id": "S002",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3574464512,
+            "elapsedSeconds": 3.9723
+          }
+        },
+        {
+          "id": "S003",
+          "category": "residence_tax",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 3,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3560833024,
+            "elapsedSeconds": 3.5037
+          }
+        },
+        {
+          "id": "S004",
+          "category": "national_pension",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3529195520,
+            "elapsedSeconds": 3.2014
+          }
+        },
+        {
+          "id": "S005",
+          "category": "utility",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3435151360,
+            "elapsedSeconds": 3.2862
+          }
+        },
+        {
+          "id": "S006",
+          "category": "utility",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3451666432,
+            "elapsedSeconds": 3.296
+          }
+        },
+        {
+          "id": "S007",
+          "category": "school",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3438788608,
+            "elapsedSeconds": 3.2633
+          }
+        },
+        {
+          "id": "S008",
+          "category": "school",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3438411776,
+            "elapsedSeconds": 3.2532
+          }
+        },
+        {
+          "id": "S009",
+          "category": "employment",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3436773376,
+            "elapsedSeconds": 3.2421
+          }
+        },
+        {
+          "id": "S010",
+          "category": "municipal",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3449700352,
+            "elapsedSeconds": 3.2256
+          }
+        },
+        {
+          "id": "S011",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": null
+          },
+          "resources": {
+            "peakRssBytes": 3442458624,
+            "elapsedSeconds": 3.238
+          }
+        },
+        {
+          "id": "R001",
+          "category": "national_health_insurance",
+          "provenance": "real_private",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": null,
+            "unverified": 0,
+            "exact": null
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": null,
+            "unverified": 7,
+            "exact": null
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 3828056064,
+            "elapsedSeconds": 9.7871
+          }
+        }
+      ],
+      "timingOrigin": "historical_ocr",
+      "publicProductionReady": false
+    },
+    {
+      "schemaVersion": 2,
+      "mode": "fresh_native_small_synthetic",
+      "groups": {
+        "synthetic": {
+          "summary": {
+            "samples": 16,
+            "successful": 16,
+            "failedOrNotExecuted": 0,
+            "scorableSamples": 16,
+            "completeAnnotations": 16,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 0,
+            "pendingKnownDeadlines": 0,
+            "pendingKnownAmounts": 0,
+            "outcomes": {
+              "ok": 16
+            },
+            "deadlines": {
+              "truePositive": 12,
+              "falsePositive": 0,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "exactMatch": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 16,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "supportingEvidence": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "unverifiedPredictions": 2,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 12,
+              "falsePositive": 0,
+              "falseNegative": 1,
+              "precision": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              },
+              "recall": {
+                "numerator": 12,
+                "denominator": 13,
+                "value": 0.9230769230769231
+              },
+              "exactMatch": {
+                "numerator": 15,
+                "denominator": 16,
+                "value": 0.9375
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 16,
+                "value": 0.0
+              },
+              "knownFieldRecall": {
+                "numerator": 12,
+                "denominator": 13,
+                "value": 0.9230769230769231
+              },
+              "knownFalseNegatives": 1,
+              "labelAssociation": {
+                "numerator": 12,
+                "denominator": 13,
+                "value": 0.9230769230769231
+              },
+              "supportingEvidence": {
+                "numerator": 12,
+                "denominator": 13,
+                "value": 0.9230769230769231
+              },
+              "unverifiedPredictions": 4,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 16,
+              "denominator": 16,
+              "value": 1.0
+            },
+            "primaryDeadline": {
+              "numerator": 16,
+              "denominator": 16,
+              "value": 1.0
+            },
+            "primaryAmount": {
+              "numerator": 15,
+              "denominator": 16,
+              "value": 0.9375
+            },
+            "extractionStatus": {
+              "numerator": 15,
+              "denominator": 16,
+              "value": 0.9375
+            },
+            "uncertainty": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "missingFields": {
+              "numerator": 11,
+              "denominator": 11,
+              "value": 1.0
+            },
+            "eraConversion": {
+              "numerator": 3,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "deduplication": {
+              "numerator": 1,
+              "denominator": 2,
+              "value": 0.5
+            },
+            "transcriptionSamples": 15,
+            "characterErrorRate": {
+              "numerator": 3,
+              "denominator": 650,
+              "value": 0.004615384615384616
+            },
+            "resources": {
+              "latencySamples": 16,
+              "medianSeconds": 0.9650851040059933,
+              "p95Seconds": 2.632540082995547,
+              "maximumSeconds": 2.632540082995547,
+              "rssSamples": 16,
+              "peakRssMiB": 891.046875,
+              "warmLatency": {
+                "samples": 15,
+                "median": 0.963842958008172,
+                "maximum": 1.3317690000112634
+              },
+              "initialization": {
+                "samples": 1,
+                "median": 1.4635942080058157,
+                "maximum": 1.4635942080058157
+              },
+              "sampledCpu": {
+                "samples": 16,
+                "median": 94.85600515017587,
+                "maximum": 99.01861599037424
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 1,
+            "field_extraction": 0,
+            "interpretation": 0,
+            "ocr_recognition": 1,
+            "unresolved": 0
+          },
+          "categoryCoverage": {
+            "employment": 1,
+            "municipal": 1,
+            "national_health_insurance": 3,
+            "national_pension": 1,
+            "residence_tax": 2,
+            "school": 1,
+            "unassigned": 0,
+            "unknown": 6,
+            "utility": 1
+          }
+        }
+      },
+      "rows": [
+        {
+          "id": "S101",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934150144,
+            "elapsedSeconds": 2.632540082995547
+          }
+        },
+        {
+          "id": "S102",
+          "category": "residence_tax",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 3,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934248448,
+            "elapsedSeconds": 1.0246719999995548
+          }
+        },
+        {
+          "id": "S103",
+          "category": "national_pension",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934297600,
+            "elapsedSeconds": 0.9744212080258876
+          }
+        },
+        {
+          "id": "S104",
+          "category": "utility",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934313984,
+            "elapsedSeconds": 0.9615121250099037
+          }
+        },
+        {
+          "id": "S105",
+          "category": "school",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934330368,
+            "elapsedSeconds": 1.012683165987255
+          }
+        },
+        {
+          "id": "S106",
+          "category": "employment",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 934330368,
+            "elapsedSeconds": 0.8958912920206785
+          }
+        },
+        {
+          "id": "S107",
+          "category": "municipal",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 922796032,
+            "elapsedSeconds": 0.9249923749885056
+          }
+        },
+        {
+          "id": "S108",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 910344192,
+            "elapsedSeconds": 0.9243335409846622
+          }
+        },
+        {
+          "id": "S109",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 915783680,
+            "elapsedSeconds": 0.9663272500038147
+          }
+        },
+        {
+          "id": "S110",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 915800064,
+            "elapsedSeconds": 0.9482304589764681
+          }
+        },
+        {
+          "id": "S111",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 1,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": false
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": false,
+            "extractionStatusCorrect": false
+          },
+          "resources": {
+            "peakRssBytes": 915947520,
+            "elapsedSeconds": 1.0387791249959264
+          }
+        },
+        {
+          "id": "S112",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 916045824,
+            "elapsedSeconds": 1.3317690000112634
+          }
+        },
+        {
+          "id": "S113",
+          "category": "residence_tax",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 2,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 916062208,
+            "elapsedSeconds": 1.0021425419836305
+          }
+        },
+        {
+          "id": "S114",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 1,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 916062208,
+            "elapsedSeconds": 0.9052429169823881
+          }
+        },
+        {
+          "id": "S115",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 1,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 916062208,
+            "elapsedSeconds": 0.8969036250200588
+          }
+        },
+        {
+          "id": "S116",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "ok",
+          "deadlines": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "amounts": {
+            "matched": 0,
+            "missed": 0,
+            "falsePositive": 0,
+            "unverified": 0,
+            "exact": true
+          },
+          "resultChecks": {
+            "documentTypeCorrect": true,
+            "primaryDeadlineCorrect": true,
+            "primaryAmountCorrect": true,
+            "extractionStatusCorrect": true
+          },
+          "resources": {
+            "peakRssBytes": 931069952,
+            "elapsedSeconds": 0.963842958008172
+          }
+        }
+      ],
+      "timingOrigin": "fresh_native",
+      "publicProductionReady": false
+    },
+    {
+      "schemaVersion": 2,
+      "mode": "fresh_native",
+      "groups": {
+        "synthetic": {
+          "summary": {
+            "samples": 11,
+            "successful": 0,
+            "failedOrNotExecuted": 11,
+            "scorableSamples": 0,
+            "completeAnnotations": 0,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 11,
+            "pendingKnownDeadlines": 13,
+            "pendingKnownAmounts": 10,
+            "outcomes": {
+              "NOT_EXECUTED_START_MEMORY_GUARD": 11
+            },
+            "deadlines": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "primaryDeadline": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "primaryAmount": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "extractionStatus": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "uncertainty": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "missingFields": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "eraConversion": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "deduplication": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "transcriptionSamples": 0,
+            "characterErrorRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "resources": {
+              "latencySamples": 0,
+              "medianSeconds": null,
+              "p95Seconds": null,
+              "maximumSeconds": null,
+              "rssSamples": 0,
+              "peakRssMiB": null,
+              "warmLatency": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "initialization": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 1,
+            "municipal": 1,
+            "national_health_insurance": 2,
+            "national_pension": 1,
+            "residence_tax": 1,
+            "school": 2,
+            "unassigned": 0,
+            "unknown": 1,
+            "utility": 2
+          }
+        },
+        "real_private": {
+          "summary": {
+            "samples": 1,
+            "successful": 0,
+            "failedOrNotExecuted": 1,
+            "scorableSamples": 0,
+            "completeAnnotations": 0,
+            "partialAnnotations": 0,
+            "unreviewedAnnotations": 0,
+            "notExecuted": 1,
+            "pendingKnownDeadlines": 2,
+            "pendingKnownAmounts": 1,
+            "outcomes": {
+              "NOT_EXECUTED_START_MEMORY_GUARD": 1
+            },
+            "deadlines": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "amounts": {
+              "truePositive": 0,
+              "falsePositive": null,
+              "falseNegative": 0,
+              "precision": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "recall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "exactMatch": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "falsePositiveDocumentRate": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFieldRecall": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "knownFalseNegatives": 0,
+              "labelAssociation": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "supportingEvidence": {
+                "numerator": 0,
+                "denominator": 0,
+                "value": null
+              },
+              "unverifiedPredictions": 0,
+              "duplicateVerifiedEntries": 0
+            },
+            "documentType": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "primaryDeadline": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "primaryAmount": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "extractionStatus": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "uncertainty": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "missingFields": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "eraConversion": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "deduplication": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "transcriptionSamples": 0,
+            "characterErrorRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "resources": {
+              "latencySamples": 0,
+              "medianSeconds": null,
+              "p95Seconds": null,
+              "maximumSeconds": null,
+              "rssSamples": 0,
+              "peakRssMiB": null,
+              "warmLatency": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "initialization": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              },
+              "sampledCpu": {
+                "samples": 0,
+                "median": null,
+                "maximum": null
+              }
+            },
+            "limitations": [
+              "convenience_sample_not_population_accuracy",
+              "variants_are_not_independent_samples",
+              "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+              "processing_failures_remain_in_complete_accuracy_denominators",
+              "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+              "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+              "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+            ]
+          },
+          "errorStages": {
+            "reviewedRequests": 0,
+            "field_extraction": null,
+            "interpretation": null,
+            "ocr_recognition": null,
+            "unresolved": null
+          },
+          "categoryCoverage": {
+            "employment": 0,
+            "municipal": 0,
+            "national_health_insurance": 1,
+            "national_pension": 0,
+            "residence_tax": 0,
+            "school": 0,
+            "unassigned": 0,
+            "unknown": 0,
+            "utility": 0
+          }
+        }
+      },
+      "rows": [
+        {
+          "id": "S001",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S002",
+          "category": "national_health_insurance",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S003",
+          "category": "residence_tax",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S004",
+          "category": "national_pension",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S005",
+          "category": "utility",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S006",
+          "category": "utility",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S007",
+          "category": "school",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S008",
+          "category": "school",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S009",
+          "category": "employment",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S010",
+          "category": "municipal",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "S011",
+          "category": "unknown",
+          "provenance": "synthetic",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        },
+        {
+          "id": "R001",
+          "category": "national_health_insurance",
+          "provenance": "real_private",
+          "outcome": "NOT_EXECUTED_START_MEMORY_GUARD",
+          "resultChecks": {},
+          "resources": {}
+        }
+      ],
+      "timingOrigin": "fresh_native",
+      "publicProductionReady": false
+    }
+  ]
+}

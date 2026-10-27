@@ -77,6 +77,21 @@ describe("evidence-based result presentation", () => {
     expect(screen.getByText("Analysis complete")).toBeInTheDocument();
     expect(screen.getByText(/Document authenticity is not assessed/)).toBeInTheDocument();
   });
+  it("keeps illustrative amounts unverified with an English reason and original evidence", async () => {
+    const user = userEvent.setup();
+    const reason = "The surrounding text identifies an illustrative example, not a confirmed document fact.";
+    const source = uploadResult().evidence.filter(e => e.id === "p1-b3").map(e => ({ ...e, text: "見本 納付額 5,000円" }));
+    show(uploadResult({ documentType: null, summary: null, primaryAmount: null, primaryDeadline: null, deadline: null,
+      deadlines: [], amounts: [{ ...field("Payment amount", "payment", "p1-b3"), value: 5000, currency: "JPY", status: "unverified", reasons: [reason] }],
+      extractionStatus: "unverified", evidence: source, documentTypeEvidenceIds: [], importantPoints: [],
+      nextSteps: ["Verify the unverified fields against the original document."] }));
+    expect(screen.getByText(reason)).toBeInTheDocument();
+    expect(screen.queryByText("Verified field")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Primary amount" }).parentElement).not.toHaveTextContent("5,000");
+    await user.click(screen.getByText("View original source text"));
+    expect(screen.getByText("見本 納付額 5,000円")).toBeVisible();
+    expect(screen.queryByText(/pay at|bank transfer|convenience store/i)).not.toBeInTheDocument();
+  });
 });
 
 describe("English date-only formatting", () => {

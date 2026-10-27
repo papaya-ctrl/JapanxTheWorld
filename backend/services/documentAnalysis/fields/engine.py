@@ -72,6 +72,19 @@ AMOUNT_PATTERN = re.compile(
 )
 PAID_PATTERN = re.compile(r"(?:お支払済み|支払い済み|支払済み|支払済|納付済み|納付済|領収済み|領収済|入金済み|入金済|お支払いが完了|支払いが完了|納付が完了)(?![額金])")
 NEGATION = re.compile(r"ではありません|ではない|ではなく|しない|わない|不要|免除|必要ありません|できません|対象外|取消|取り消し|無効|未確定|予定|場合|支払済では|納付済では")
+ILLUSTRATIVE = re.compile(r"記入例|記載例|入力例|見本|サンプル|例えば")
+
+
+def _illustrative_span(run,start,end):
+    # Limit the qualifier to this text clause and nearby text. A separate example
+    # elsewhere on a page must not invalidate a genuine field or payment stamp.
+    left=max(0,start-32);right=min(len(run.text),end+12)
+    prefix=run.text[left:start];suffix=run.text[end:right]
+    boundaries=list(re.finditer(r'[。;；]',prefix))
+    if boundaries:left+=boundaries[-1].end()
+    boundary=re.search(r'[。;；]',suffix)
+    if boundary:right=end+boundary.start()
+    return (left,right) if ILLUSTRATIVE.search(run.text[left:right]) else None
 
 
 @dataclass
@@ -210,6 +223,13 @@ def _entry(token, label, alternatives, ambiguous, runs, minimum_confidence, cate
         reasons.append("The label does not establish the amount's payment role.")
     if ambiguous:
         reasons.append("Competing labels have similar association strength.")
+    illustrative=[]
+    for item in [token,*alternatives]:
+        span=_illustrative_span(runs[item.run],item.start,item.end)
+        if span:illustrative.extend(runs[item.run].sources(*span))
+    if illustrative:
+        reasons.append("The surrounding text identifies an illustrative example, not a confirmed document fact.")
+        boxes.extend(illustrative)
     if category == "amount" and label and token.kind == "bare":
         vr, lr = runs[token.run], runs[label.run]
         vb, lb = vr.reading_bounds(token.start, token.end), lr.reading_bounds(label.start, label.end)
@@ -285,6 +305,7 @@ def _identify(runs, threshold):
                 sources = run.sources(match.start(), match.end())
                 context = run.text[max(0, match.start() - 4):match.end() + 12]
                 if (_confidence(sources) >= threshold and not NEGATION.search(context)
+                        and not _illustrative_span(run,match.start(),match.end())
                         and run.text[match.end():match.end() + 1] != "を"):
                     found.append((english, specificity, [b.id for b in sources]))
     if not found:
@@ -361,7 +382,7 @@ def extract_fields(boxes: list[OCRBox], *, minimum_confidence: float = .85) -> d
     for run in runs:
         for match in PAID_PATTERN.finditer(run.text):
             context = run.text[max(0, match.start() - 8):match.end() + 12]
-            if NEGATION.search(context) or any(x in context for x in ("場合", "確認", "未納", "一部", "ください", "済印", "済欄", "□", "☐", "未記入")):
+            if NEGATION.search(context) or _illustrative_span(run,match.start(),match.end()) or any(x in context for x in ("場合", "確認", "未納", "一部", "ください", "済印", "済欄", "□", "☐", "未記入")):
                 continue
             sources = run.sources(match.start(), match.end())
             if _confidence(sources) >= minimum_confidence:

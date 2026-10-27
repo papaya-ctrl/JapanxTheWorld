@@ -1,0 +1,560 @@
+{
+  "$defs": {
+    "Amount": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "payment",
+            "billed",
+            "total",
+            "outstanding",
+            "late_fee",
+            "paid",
+            "tax",
+            "unknown"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        },
+        "label": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "label",
+        "evidence"
+      ],
+      "title": "Amount",
+      "type": "object"
+    },
+    "Deadline": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "payment",
+            "submission",
+            "application",
+            "acceptance",
+            "response",
+            "return",
+            "usage_expiration",
+            "validity_expiration"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "date",
+        "label",
+        "evidence"
+      ],
+      "title": "Deadline",
+      "type": "object"
+    },
+    "Document": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[RS]\\d{3}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "inputSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Inputsha256",
+          "type": "string"
+        },
+        "provenance": {
+          "enum": [
+            "synthetic",
+            "real_private",
+            "anonymized_real"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Category"
+        },
+        "authorizationConfirmed": {
+          "title": "Authorizationconfirmed",
+          "type": "boolean"
+        },
+        "variant": {
+          "default": "unspecified",
+          "pattern": "^[a-z0-9_]{1,60}$",
+          "title": "Variant",
+          "type": "string"
+        },
+        "groundTruth": {
+          "$ref": "#/$defs/GroundTruth"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "inputSha256",
+        "provenance",
+        "category",
+        "authorizationConfirmed",
+        "groundTruth"
+      ],
+      "title": "Document",
+      "type": "object"
+    },
+    "EraCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "literal": {
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Literal",
+          "type": "string"
+        },
+        "expectedDate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expecteddate"
+        },
+        "kind": {
+          "enum": [
+            "payment",
+            "submission",
+            "application",
+            "acceptance",
+            "response",
+            "return",
+            "usage_expiration",
+            "validity_expiration"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "page": {
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "literal",
+        "expectedDate",
+        "kind",
+        "page"
+      ],
+      "title": "EraCheck",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "page": {
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "text",
+        "page"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "GroundTruth": {
+      "additionalProperties": false,
+      "properties": {
+        "verification": {
+          "$ref": "#/$defs/Verification"
+        },
+        "complete": {
+          "default": false,
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "documentType": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Documenttype"
+        },
+        "deadlines": {
+          "items": {
+            "$ref": "#/$defs/Deadline"
+          },
+          "maxItems": 100,
+          "title": "Deadlines",
+          "type": "array"
+        },
+        "amounts": {
+          "items": {
+            "$ref": "#/$defs/Amount"
+          },
+          "maxItems": 100,
+          "title": "Amounts",
+          "type": "array"
+        },
+        "primaryDeadline": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primarydeadline"
+        },
+        "primaryAmount": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primaryamount"
+        },
+        "extractionStatus": {
+          "anyOf": [
+            {
+              "enum": [
+                "verified",
+                "partial",
+                "unverified",
+                "no_fields"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extractionstatus"
+        },
+        "missingFields": {
+          "items": {
+            "enum": [
+              "deadlines",
+              "amounts",
+              "documentType",
+              "primaryDeadline",
+              "primaryAmount"
+            ],
+            "type": "string"
+          },
+          "title": "Missingfields",
+          "type": "array"
+        },
+        "uncertainFields": {
+          "items": {
+            "$ref": "#/$defs/UncertainField"
+          },
+          "maxItems": 100,
+          "title": "Uncertainfields",
+          "type": "array"
+        },
+        "eraChecks": {
+          "items": {
+            "$ref": "#/$defs/EraCheck"
+          },
+          "maxItems": 100,
+          "title": "Erachecks",
+          "type": "array"
+        },
+        "repeatedAmounts": {
+          "items": {
+            "$ref": "#/$defs/RepeatedAmount"
+          },
+          "maxItems": 100,
+          "title": "Repeatedamounts",
+          "type": "array"
+        },
+        "transcription": {
+          "anyOf": [
+            {
+              "maxLength": 10000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transcription"
+        }
+      },
+      "required": [
+        "verification"
+      ],
+      "title": "GroundTruth",
+      "type": "object"
+    },
+    "RepeatedAmount": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "payment",
+            "billed",
+            "total",
+            "outstanding",
+            "late_fee",
+            "paid",
+            "tax",
+            "unknown"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        },
+        "occurrences": {
+          "maximum": 100,
+          "minimum": 2,
+          "title": "Occurrences",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "occurrences"
+      ],
+      "title": "RepeatedAmount",
+      "type": "object"
+    },
+    "UncertainField": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "deadlines",
+            "amounts"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Date"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "reason": {
+          "enum": [
+            "source_ambiguous",
+            "source_unreadable",
+            "conditional",
+            "illustrative",
+            "low_confidence_input",
+            "invalid_literal",
+            "competing_values"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "mustNotBePrimary": {
+          "default": true,
+          "title": "Mustnotbeprimary",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "field",
+        "kind",
+        "evidence",
+        "reason"
+      ],
+      "title": "UncertainField",
+      "type": "object"
+    },
+    "Verification": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "unreviewed",
+            "partial",
+            "verified"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "pending",
+            "independent_human",
+            "synthetic_specification"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "reviewerId": {
+          "anyOf": [
+            {
+              "pattern": "^H\\d{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewerid"
+        }
+      },
+      "required": [
+        "status",
+        "method"
+      ],
+      "title": "Verification",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 2,
+      "default": 2,
+      "title": "Schemaversion",
+      "type": "integer"
+    },
+    "targetRealDocuments": {
+      "const": 40,
+      "default": 40,
+      "title": "Targetrealdocuments",
+      "type": "integer"
+    },
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/Document"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Documents",
+      "type": "array"
+    }
+  },
+  "required": [
+    "documents"
+  ],
+  "title": "Dataset",
+  "type": "object"
+}

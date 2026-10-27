@@ -144,6 +144,11 @@ macOS HTTPS/OCR/recovery checks passed; Linux container execution remains pendin
 because Docker was unavailable and host memory was insufficient. Public deployment
 remains NO-GO.
 
+Step 12 adds [independent accuracy evaluation](docs/21_accuracy_evaluation_workflow.md)
+and a [measured accuracy report](docs/22_document_accuracy_report.md). Automated
+checks pass, while real accuracy remains incomplete: one partial real document,
+no complete real false-positive denominator, and Linux execution still pending.
+
 ## Privacy / AI Disclaimer
 
 JapanxTheWorld is a support tool. Extracted results and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.

@@ -2,9 +2,10 @@
 from datetime import date
 import re
 
+KANJI_NUMBER = r"(?:[二三四五六七八九]?十[一二三四五六七八九]?|[一二三四五六七八九])"
 DATE_PATTERN = re.compile(
-    r"(?<![\dA-Za-z])(?:(?P<era>令和|平成|昭和)(?P<ey>元|\d{1,2})年"
-    r"(?P<em>\d{1,2})月(?P<ed>\d{1,2})日"
+    rf"(?<![\dA-Za-z])(?:(?P<era>令和|平成|昭和)(?P<ey>元|\d{{1,2}}|{KANJI_NUMBER})年"
+    rf"(?P<em>\d{{1,2}}|{KANJI_NUMBER})月(?P<ed>\d{{1,2}}|{KANJI_NUMBER})日"
     r"|(?P<year>\d{4})(?:年(?P<jm>\d{1,2})月(?P<jd>\d{1,2})日"
     r"|(?P<sep>[/.-])(?P<month>\d{1,2})(?P=sep)(?P<day>\d{1,2})))(?!\d)"
 )
@@ -17,14 +18,23 @@ ERAS = {
 }
 
 
+def _number(literal):
+    if literal.isdecimal():return int(literal)
+    digits={char:index for index,char in enumerate('一二三四五六七八九',1)}
+    if '十' in literal:
+        tens,ones=literal.split('十')
+        return (digits[tens] if tens else 1)*10+(digits[ones] if ones else 0)
+    return digits[literal]
+
+
 def parse_date(match: re.Match) -> str | None:
     try:
         if match["era"]:
             offset, start, end = ERAS[match["era"]]
-            era_year = 1 if match["ey"] == "元" else int(match["ey"])
+            era_year = 1 if match["ey"] == "元" else _number(match["ey"])
             if era_year < 1:
                 return None
-            value = date(offset + era_year, int(match["em"]), int(match["ed"]))
+            value = date(offset + era_year, _number(match["em"]), _number(match["ed"]))
             if value < start or (end and value > end):
                 return None
         else:
