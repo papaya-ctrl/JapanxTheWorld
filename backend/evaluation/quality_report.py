@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 from .quality import summarize_quality
 from .review import summary as review_summary,STAGES
-from .schema import CATEGORIES
+from .schema import CATEGORIES,PROVENANCES,dataset_group
 from .vault import read_json
 
 MODES={'fresh_native','fresh_native_small_synthetic','frozen_step9_ocr_current_engine_replay','controlled_ocr'}
@@ -32,9 +32,11 @@ def public_report(metrics):
     rows=[];seen=set()
     for row in metrics['rows']:
         identifier=row['id'];category=row['category'];provenance=row['provenance'];outcome=row['outcome']
-        if not isinstance(identifier,str) or not re.fullmatch(r'[RS]\d{3}',identifier) or identifier in seen:raise ValueError('Use distinct anonymous sample IDs.')
+        if not isinstance(identifier,str) or not re.fullmatch(r'[RSP]\d{3}',identifier) or identifier in seen:raise ValueError('Use distinct anonymous sample IDs.')
         seen.add(identifier)
-        if category not in CATEGORIES|{'unassigned'} or provenance not in {'synthetic','real_private','anonymized_real'} or outcome not in OUTCOMES:raise ValueError('Unrecognized public metadata.')
+        if category not in CATEGORIES|{'unassigned'} or provenance not in PROVENANCES or outcome not in OUTCOMES:raise ValueError('Unrecognized public metadata.')
+        prefix='S' if provenance=='synthetic' else 'P' if provenance=='public_sample_form' else 'R'
+        if not identifier.startswith(prefix):raise ValueError('Sample ID and dataset group disagree.')
         original=row['accuracy'];accuracy={k:numeric(original[k]) for k in SCALARS if k in original}
         for field in ['deadlines','amounts']:
             if field in original:accuracy[field]={k:numeric(original[field][k]) for k in COUNTERS if k in original[field]}
@@ -48,7 +50,7 @@ def public_report(metrics):
             cleaned['manualErrorReview']={'reviewed':review['reviewed'],'counts':{stage:numeric(review['counts'][stage]) for stage in STAGES} if review['reviewed'] else None}
         rows.append(cleaned)
     groups={}
-    for provenance in ['synthetic','real_private','anonymized_real']:
+    for provenance in PROVENANCES:
         selected=[r for r in rows if r['provenance']==provenance]
         if selected:groups[provenance]={'summary':summarize_quality(selected),'errorStages':review_summary(selected),
             'categoryCoverage':{category:sum(r['category']==category for r in selected) for category in sorted(CATEGORIES|{'unassigned'})}}
@@ -63,6 +65,7 @@ def public_report(metrics):
         item['resources']={k:v for k,v in row['resources'].items() if k in {'elapsedSeconds','peakRssBytes'}}
         public_rows.append(item)
     return {'schemaVersion':2,'mode':mode,'groups':groups,'rows':public_rows,
+        'datasetGroupCounts':{group:sum(dataset_group(r['provenance'])==group for r in rows) for group in ['issued_documents','public_sample_forms','synthetic_fixtures']},
         'timingOrigin':'historical_ocr' if mode.startswith('frozen') else 'no_native_ocr' if mode=='controlled_ocr' else 'fresh_native',
         'publicProductionReady':False}
 

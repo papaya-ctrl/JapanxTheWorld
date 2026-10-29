@@ -97,7 +97,7 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "pattern": "^[RS]\\d{3}$",
+          "pattern": "^[RSP]\\d{3}$",
           "title": "Id",
           "type": "string"
         },
@@ -114,7 +114,8 @@
           "enum": [
             "synthetic",
             "real_private",
-            "anonymized_real"
+            "anonymized_real",
+            "public_sample_form"
           ],
           "title": "Provenance",
           "type": "string"
@@ -363,12 +364,97 @@
           ],
           "default": null,
           "title": "Transcription"
+        },
+        "englishInterpretation": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Englishinterpretation"
+        },
+        "pilotReview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PilotReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
         "verification"
       ],
       "title": "GroundTruth",
+      "type": "object"
+    },
+    "PilotReview": {
+      "additionalProperties": false,
+      "properties": {
+        "reviewerId": {
+          "pattern": "^H\\d{3}$",
+          "title": "Reviewerid",
+          "type": "string"
+        },
+        "independentOfPrediction": {
+          "title": "Independentofprediction",
+          "type": "boolean"
+        },
+        "categoryReviewed": {
+          "title": "Categoryreviewed",
+          "type": "boolean"
+        },
+        "deadlinesAndMeaningsReviewed": {
+          "title": "Deadlinesandmeaningsreviewed",
+          "type": "boolean"
+        },
+        "amountsAndLabelsReviewed": {
+          "title": "Amountsandlabelsreviewed",
+          "type": "boolean"
+        },
+        "paidAndUnpaidReviewed": {
+          "title": "Paidandunpaidreviewed",
+          "type": "boolean"
+        },
+        "multipleDatesAndAmountsReviewed": {
+          "title": "Multipledatesandamountsreviewed",
+          "type": "boolean"
+        },
+        "missingAndAmbiguousReviewed": {
+          "title": "Missingandambiguousreviewed",
+          "type": "boolean"
+        },
+        "japaneseEvidenceReviewed": {
+          "title": "Japaneseevidencereviewed",
+          "type": "boolean"
+        },
+        "englishInterpretationReviewed": {
+          "title": "Englishinterpretationreviewed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reviewerId",
+        "independentOfPrediction",
+        "categoryReviewed",
+        "deadlinesAndMeaningsReviewed",
+        "amountsAndLabelsReviewed",
+        "paidAndUnpaidReviewed",
+        "multipleDatesAndAmountsReviewed",
+        "missingAndAmbiguousReviewed",
+        "japaneseEvidenceReviewed",
+        "englishInterpretationReviewed"
+      ],
+      "title": "PilotReview",
       "type": "object"
     },
     "RepeatedAmount": {

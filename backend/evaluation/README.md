@@ -6,6 +6,10 @@ Use the [current workflow](../../docs/21_accuracy_evaluation_workflow.md) and
 [measured results](../../docs/22_document_accuracy_report.md) for new evaluation.
 The commands below document the original Step 9 schema and historical comparisons.
 
+Step 13's [pilot report and human-review gate](../../docs/23_real_document_validation_pilot.md)
+add separate public-form provenance and formal review requirements. Existing partial
+known-fact diagnostics remain distinct from qualified pilot accuracy.
+
 Run from the project root using Python 3.12 and `backend/requirements-dev.txt`.
 Evaluation runs local PaddleOCR and deterministic Python, serially, without paid
 AI calls. Never run native profile benchmarks alongside API smoke tests or another

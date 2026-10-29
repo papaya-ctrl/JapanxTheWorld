@@ -1,0 +1,429 @@
+{
+  "date": "2026-10-27",
+  "issuedDocumentDiagnostic": {
+    "schemaVersion": 2,
+    "mode": "fresh_native",
+    "groups": {
+      "real_private": {
+        "summary": {
+          "samples": 1,
+          "successful": 1,
+          "failedOrNotExecuted": 0,
+          "scorableSamples": 1,
+          "completeAnnotations": 0,
+          "partialAnnotations": 1,
+          "unreviewedAnnotations": 0,
+          "notExecuted": 0,
+          "pendingKnownDeadlines": 0,
+          "pendingKnownAmounts": 0,
+          "outcomes": {
+            "ok": 1
+          },
+          "deadlines": {
+            "truePositive": 0,
+            "falsePositive": null,
+            "falseNegative": 0,
+            "precision": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "exactMatch": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "falsePositiveDocumentRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "knownFieldRecall": {
+              "numerator": 2,
+              "denominator": 2,
+              "value": 1.0
+            },
+            "knownFalseNegatives": 0,
+            "labelAssociation": {
+              "numerator": 2,
+              "denominator": 2,
+              "value": 1.0
+            },
+            "supportingEvidence": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unverifiedPredictions": 0,
+            "duplicateVerifiedEntries": 0
+          },
+          "amounts": {
+            "truePositive": 0,
+            "falsePositive": null,
+            "falseNegative": 0,
+            "precision": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "exactMatch": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "falsePositiveDocumentRate": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "knownFieldRecall": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "knownFalseNegatives": 0,
+            "labelAssociation": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "supportingEvidence": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unverifiedPredictions": 7,
+            "duplicateVerifiedEntries": 0
+          },
+          "documentType": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1.0
+          },
+          "primaryDeadline": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1.0
+          },
+          "primaryAmount": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1.0
+          },
+          "extractionStatus": {
+            "numerator": 1,
+            "denominator": 1,
+            "value": 1.0
+          },
+          "uncertainty": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "missingFields": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "eraConversion": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "deduplication": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "transcriptionSamples": 0,
+          "characterErrorRate": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "resources": {
+            "latencySamples": 1,
+            "medianSeconds": 13.00339966699994,
+            "p95Seconds": 13.00339966699994,
+            "maximumSeconds": 13.00339966699994,
+            "rssSamples": 1,
+            "peakRssMiB": 4339.5,
+            "warmLatency": {
+              "samples": 0,
+              "median": null,
+              "maximum": null
+            },
+            "initialization": {
+              "samples": 1,
+              "median": 2.7437934580002548,
+              "maximum": 2.7437934580002548
+            },
+            "sampledCpu": {
+              "samples": 1,
+              "median": 88.96072383560657,
+              "maximum": 88.96072383560657
+            }
+          },
+          "limitations": [
+            "convenience_sample_not_population_accuracy",
+            "variants_are_not_independent_samples",
+            "partial_ground_truth_excluded_from_precision_and_exact_denominators",
+            "processing_failures_remain_in_complete_accuracy_denominators",
+            "character_edit_error_includes_reading_order_and_is_not_an_automatic_root_cause_label",
+            "false_positive_rate_means_documents_with_any_false_verified_field_per_complete_document",
+            "unverified_candidates_are_retained_and_do_not_count_as_verified_positives"
+          ]
+        },
+        "errorStages": {
+          "reviewedRequests": 0,
+          "field_extraction": null,
+          "interpretation": null,
+          "ocr_recognition": null,
+          "unresolved": null
+        },
+        "categoryCoverage": {
+          "employment": 0,
+          "municipal": 0,
+          "national_health_insurance": 1,
+          "national_pension": 0,
+          "residence_tax": 0,
+          "school": 0,
+          "unassigned": 0,
+          "unknown": 0,
+          "utility": 0
+        }
+      }
+    },
+    "rows": [
+      {
+        "id": "R001",
+        "category": "national_health_insurance",
+        "provenance": "real_private",
+        "outcome": "ok",
+        "deadlines": {
+          "matched": 2,
+          "missed": 0,
+          "falsePositive": null,
+          "unverified": 0,
+          "exact": null
+        },
+        "amounts": {
+          "matched": 1,
+          "missed": 0,
+          "falsePositive": null,
+          "unverified": 7,
+          "exact": null
+        },
+        "resultChecks": {
+          "documentTypeCorrect": true,
+          "primaryDeadlineCorrect": true,
+          "primaryAmountCorrect": true,
+          "extractionStatusCorrect": true
+        },
+        "resources": {
+          "peakRssBytes": 4550295552,
+          "elapsedSeconds": 13.00339966699994
+        }
+      }
+    ],
+    "datasetGroupCounts": {
+      "issued_documents": 1,
+      "public_sample_forms": 0,
+      "synthetic_fixtures": 0
+    },
+    "timingOrigin": "fresh_native",
+    "publicProductionReady": false
+  },
+  "humanPilotReview": {
+    "targetIssuedDocuments": 40,
+    "groups": {
+      "issued_documents": {
+        "samples": 1,
+        "pilotEligible": 0,
+        "categoryCoverage": {
+          "employment": 0,
+          "municipal": 0,
+          "national_health_insurance": 1,
+          "national_pension": 0,
+          "residence_tax": 0,
+          "school": 0,
+          "unassigned": 0,
+          "unknown": 0,
+          "utility": 0
+        }
+      },
+      "public_sample_forms": {
+        "samples": 0,
+        "pilotEligible": 0,
+        "categoryCoverage": {
+          "employment": 0,
+          "municipal": 0,
+          "national_health_insurance": 0,
+          "national_pension": 0,
+          "residence_tax": 0,
+          "school": 0,
+          "unassigned": 0,
+          "unknown": 0,
+          "utility": 0
+        }
+      },
+      "synthetic_fixtures": {
+        "samples": 0,
+        "pilotEligible": 0,
+        "categoryCoverage": {
+          "employment": 0,
+          "municipal": 0,
+          "national_health_insurance": 0,
+          "national_pension": 0,
+          "residence_tax": 0,
+          "school": 0,
+          "unassigned": 0,
+          "unknown": 0,
+          "utility": 0
+        }
+      }
+    },
+    "samples": [
+      {
+        "id": "R001",
+        "datasetGroup": "issued_documents",
+        "category": "national_health_insurance",
+        "pilotEligible": false,
+        "reviewGaps": [
+          "complete_independent_human_truth_missing",
+          "required_review_fields_missing",
+          "english_interpretation_missing",
+          "human_review_checklist_incomplete",
+          "reviewer_binding_missing"
+        ]
+      }
+    ],
+    "realAccuracyEstablished": false,
+    "publicProductionReady": false,
+    "policy": "review_independently_before_ocr_keep_public_forms_separate_from_issued_documents"
+  },
+  "syntheticBlurProbe": {
+    "samples": [
+      {
+        "id": "S101",
+        "detectedAmountLines": 2,
+        "minimumSourceInkCoverage": 0.9945652173913043,
+        "correctLabelsFullPipeline": 2,
+        "correctLabelsDetectedCrop": 2,
+        "correctLabelsOracleCrop": 2,
+        "minimumRecognitionConfidence": 0.9970493316650391,
+        "originalVerifiedAmountGroups": 1,
+        "counterfactualVerifiedAmountGroups": 1,
+        "fullImageInferenceSeconds": 1.055629707999742,
+        "sampledPeakRssMiB": 887.484375
+      },
+      {
+        "id": "S111",
+        "detectedAmountLines": 2,
+        "minimumSourceInkCoverage": 1.0,
+        "correctLabelsFullPipeline": 0,
+        "correctLabelsDetectedCrop": 0,
+        "correctLabelsOracleCrop": 0,
+        "minimumRecognitionConfidence": 0.9574993848800659,
+        "originalVerifiedAmountGroups": 0,
+        "counterfactualVerifiedAmountGroups": 1,
+        "fullImageInferenceSeconds": 1.0353026250004405,
+        "sampledPeakRssMiB": 887.671875
+      }
+    ],
+    "rootCause": "blur_associated_text_recognition_label_substitution",
+    "productionCorrectionEnabled": false,
+    "workerClosed": true
+  },
+  "issuedPerformance": {
+    "environment": {
+      "os": "Darwin",
+      "machine": "arm64",
+      "python": "3.12.13",
+      "logicalCpus": 10,
+      "hostRamGiB": 16.0,
+      "cgroupMemoryLimitMiB": null,
+      "versions": {
+        "paddleocr": "3.7.0",
+        "paddlepaddle": "3.2.0",
+        "paddlex": "3.7.2",
+        "Pillow": "13.0.0"
+      },
+      "samplingSeconds": 0.05,
+      "platformRequested": null,
+      "declaredHostMachine": null,
+      "declaredHostOS": null,
+      "containerExecution": false
+    },
+    "workload": "private_input_unscored",
+    "configuration": {
+      "models": "Medium/Medium",
+      "batch": 1,
+      "cpuThreads": 4,
+      "detectorSide": 1600,
+      "rssCapGiB": 5
+    },
+    "rows": [
+      {
+        "request": 1,
+        "seconds": 10.7251,
+        "modelInitSeconds": 1.0476,
+        "inferenceSeconds": 9.5682,
+        "peakRssMiB": 3682.95,
+        "rssAfterMiB": 3617.73,
+        "cpuUtilizationPercent": 103.3,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": false,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": null
+      },
+      {
+        "request": 2,
+        "seconds": 9.4778,
+        "modelInitSeconds": 0.0,
+        "inferenceSeconds": 9.4218,
+        "peakRssMiB": 3756.88,
+        "rssAfterMiB": 3756.86,
+        "cpuUtilizationPercent": 103.9,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": true,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": null
+      },
+      {
+        "request": 3,
+        "seconds": 9.518,
+        "modelInitSeconds": 0.0,
+        "inferenceSeconds": 9.4745,
+        "peakRssMiB": 3758.53,
+        "rssAfterMiB": 3758.53,
+        "cpuUtilizationPercent": 104.7,
+        "containerCurrentMiB": null,
+        "containerPeakSampleMiB": null,
+        "workerReused": true,
+        "workerRecycled": false,
+        "knownSyntheticFieldsCorrect": null
+      }
+    ],
+    "coldSeconds": 10.7251,
+    "medianWarmSeconds": 9.4979,
+    "endRssGrowthMiB": 140.8,
+    "workerClosed": true,
+    "memoryGrowthLimitation": "Only bounded requests; not a leak or sustained-throughput proof."
+  },
+  "qualifiedRealAccuracyEstablished": false,
+  "linuxDeploymentReady": false,
+  "publicProductionReady": false
+}

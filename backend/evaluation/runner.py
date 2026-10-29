@@ -151,6 +151,11 @@ def load_manifest(path):
     if path.is_relative_to(Path(__file__).resolve().parents[2]):
         raise ValueError("Keep manifests and annotations outside the workspace.")
     manifest=json.loads(path.read_text(encoding="utf-8"))
+    return validate_manifest(manifest)
+
+
+def validate_manifest(manifest):
+    """Reuse legacy validation for a decrypted in-memory private manifest."""
     if manifest.get("schemaVersion") != 1 or not isinstance(manifest.get("documents"),list):
         raise ValueError("Unsupported evaluation manifest schema.")
     ids=set()

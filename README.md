@@ -149,6 +149,11 @@ and a [measured accuracy report](docs/22_document_accuracy_report.md). Automated
 checks pass, while real accuracy remains incomplete: one partial real document,
 no complete real false-positive denominator, and Linux execution still pending.
 
+The [Step 13 real-document pilot report](docs/23_real_document_validation_pilot.md)
+records a fresh diagnostic on the one authorized issued document, separates public
+sample forms from issued data, and explains the blurred-label recognition miss.
+Formal pilot accuracy remains unavailable until complete independent human review.
+
 ## Privacy / AI Disclaimer
 
 JapanxTheWorld is a support tool. Extracted results and trusted guidance do not replace official confirmation. For immigration, tax, insurance, legal, medical, financial, government, school, or deadline-related decisions, users should confirm with the issuing organization or official sources.

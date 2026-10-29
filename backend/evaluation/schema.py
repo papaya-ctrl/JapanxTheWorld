@@ -6,6 +6,15 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator, f
 
 CATEGORIES = {'national_health_insurance','residence_tax','national_pension','utility',
               'school','employment','municipal','unknown'}
+ISSUED_PROVENANCES = {'real_private','anonymized_real'}
+PROVENANCES = ('real_private','anonymized_real','public_sample_form','synthetic')
+
+
+def dataset_group(provenance):
+    if provenance in ISSUED_PROVENANCES:return 'issued_documents'
+    if provenance=='public_sample_form':return 'public_sample_forms'
+    if provenance=='synthetic':return 'synthetic_fixtures'
+    raise ValueError('Unsupported dataset provenance.')
 DEADLINE_KINDS = Literal['payment','submission','application','acceptance','response','return','usage_expiration','validity_expiration']
 AMOUNT_KINDS = Literal['payment','billed','total','outstanding','late_fee','paid','tax','unknown']
 Page = Annotated[StrictInt, Field(ge=1,le=5)]
@@ -83,6 +92,19 @@ class Verification(Annotation):
     reviewerId: str | None = Field(default=None,pattern=r'^H\d{3}$')
 
 
+class PilotReview(Annotation):
+    reviewerId: str = Field(pattern=r'^H\d{3}$')
+    independentOfPrediction: bool
+    categoryReviewed: bool
+    deadlinesAndMeaningsReviewed: bool
+    amountsAndLabelsReviewed: bool
+    paidAndUnpaidReviewed: bool
+    multipleDatesAndAmountsReviewed: bool
+    missingAndAmbiguousReviewed: bool
+    japaneseEvidenceReviewed: bool
+    englishInterpretationReviewed: bool
+
+
 class GroundTruth(Annotation):
     verification: Verification
     complete: bool = False
@@ -97,6 +119,15 @@ class GroundTruth(Annotation):
     eraChecks: list[EraCheck] = Field(default_factory=list,max_length=100)
     repeatedAmounts: list[RepeatedAmount] = Field(default_factory=list,max_length=100)
     transcription: str | None = Field(default=None,max_length=10000)
+    englishInterpretation: str | None = Field(default=None,min_length=1,max_length=2000)
+    pilotReview: PilotReview | None = None
+
+    @field_validator('englishInterpretation')
+    @classmethod
+    def english_prose(cls,value):
+        import re
+        if value is not None and re.search(r'[\u3040-\u30ff\u3400-\u9fff]',value):raise ValueError('Write English interpretation separately from original Japanese source evidence.')
+        return value
 
     @model_validator(mode='after')
     def independent_review(self):
@@ -118,10 +149,10 @@ class GroundTruth(Annotation):
 
 
 class Document(Annotation):
-    id: str = Field(pattern=r'^[RS]\d{3}$')
+    id: str = Field(pattern=r'^[RSP]\d{3}$')
     path: str
     inputSha256: str = Field(pattern=r'^[0-9a-f]{64}$')
-    provenance: Literal['synthetic','real_private','anonymized_real']
+    provenance: Literal['synthetic','real_private','anonymized_real','public_sample_form']
     category: str | None
     authorizationConfirmed: bool
     variant: str = Field(default='unspecified',pattern=r'^[a-z0-9_]{1,60}$')
@@ -130,10 +161,10 @@ class Document(Annotation):
     @model_validator(mode='after')
     def provenance_and_review(self):
         if self.category is not None and self.category not in CATEGORIES:raise ValueError('Unsupported category.')
-        real=self.provenance!='synthetic'
-        if (self.id.startswith('R'))!=real:raise ValueError('Sample IDs must distinguish real and synthetic inputs.')
-        if real and self.groundTruth.verification.method=='synthetic_specification':raise ValueError('Synthetic specifications are not real ground truth.')
-        if not real and self.groundTruth.verification.method=='independent_human':raise ValueError('Keep generated specifications separate from real review.')
+        prefix='S' if self.provenance=='synthetic' else 'P' if self.provenance=='public_sample_form' else 'R'
+        if not self.id.startswith(prefix):raise ValueError('Sample IDs must distinguish issued documents, public forms and synthetic inputs.')
+        if self.provenance!='synthetic' and self.groundTruth.verification.method=='synthetic_specification':raise ValueError('Synthetic specifications are not human ground truth for issued documents or public forms.')
+        if self.provenance=='synthetic' and self.groundTruth.verification.method=='independent_human':raise ValueError('Keep generated specifications separate from real review.')
         if self.groundTruth.verification.status!='unreviewed' and self.category is None:raise ValueError('Reviewed samples require an explicit category, including unknown.')
         return self
 

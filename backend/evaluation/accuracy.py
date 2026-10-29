@@ -13,7 +13,7 @@ import time
 import psutil
 
 from .quality import score_document,summarize_quality
-from .schema import Dataset,truth_dict,CATEGORIES
+from .schema import Dataset,truth_dict,CATEGORIES,PROVENANCES,ISSUED_PROVENANCES
 from .vault import private_path,read_json,save_json,write_private
 
 
@@ -22,7 +22,7 @@ def initialize(inputs,output,*,provenance='real_private',authorized=False,key=No
     if any(not p.is_file() or p.suffix.lower() not in {'.png','.jpg','.jpeg','.webp','.pdf'} for p in paths):raise ValueError('Supply existing supported authorized inputs.')
     if any(p.stat().st_size>10*1024**2 for p in paths):raise ValueError('Inputs must respect the production upload limit.')
     dataset=Dataset.model_validate({'schemaVersion':2,'targetRealDocuments':40,'documents':[
-        {'id':f'R{i+1:03d}','path':str(path),'inputSha256':hashlib.sha256(path.read_bytes()).hexdigest(),'provenance':provenance,'category':None,
+        {'id':f"{'P' if provenance=='public_sample_form' else 'R'}{i+1:03d}",'path':str(path),'inputSha256':hashlib.sha256(path.read_bytes()).hexdigest(),'provenance':provenance,'category':None,
          'authorizationConfirmed':authorized,'groundTruth':{'complete':False,'verification':{'status':'unreviewed','method':'pending'}}}
         for i,path in enumerate(paths)]})
     # exclude_unset prevents unknown optional facts from becoming null assertions.
@@ -42,9 +42,8 @@ def documents(path,*,legacy=False,key=None):
             item=d.model_dump();item['groundTruth']=truth_dict(d);result.append(item)
         return result
     if not legacy:raise ValueError('Legacy known facts require explicit --legacy-known-facts acknowledgement.')
-    if key:raise ValueError('Migrate legacy annotations privately before encrypting them.')
-    from .runner import load_manifest
-    result=load_manifest(path)['documents']
+    from .runner import validate_manifest
+    result=validate_manifest(raw)['documents']
     if not 1<=len(result)<=50:raise ValueError('Use one to fifty documents.')
     for item in result:
         if not item['groundTruth'].get('complete') and not (item['groundTruth'].get('deadlines') or item['groundTruth'].get('amounts')):
@@ -62,7 +61,7 @@ def _row(item,result,outcome,resources=None):
 
 def report(rows,mode,*,environment=None):
     groups={}
-    for provenance in ['real_private','anonymized_real','synthetic']:
+    for provenance in PROVENANCES:
         selected=[r for r in rows if r['provenance']==provenance]
         if selected:groups[provenance]={'summary':summarize_quality(selected),
             'categories':{category:summarize_quality([r for r in selected if r['category']==category]) for category in sorted({r['category'] for r in selected})}}
@@ -73,7 +72,7 @@ def report(rows,mode,*,environment=None):
     return {'schemaVersion':2,'mode':mode,'environment':environment,'targetRealDocuments':40,
         'implementationSha256':fingerprints,
         'groups':groups,'rows':rows,
-        'missingRealCategories':sorted(CATEGORIES-{r['category'] for r in rows if r['provenance']!='synthetic'}),
+        'missingRealCategories':sorted(CATEGORIES-{r['category'] for r in rows if r['provenance'] in ISSUED_PROVENANCES}),
         'groundTruthPolicy':'independent_annotations_only_no_prediction_promotion',
         'linuxRuntimeVerified':False,'publicProductionReady':False}
 
@@ -124,7 +123,7 @@ class Observation:
     def __exit__(self,*args):self.stop.set();self.thread.join(timeout=1)
 
 
-def native(manifest,output,*,legacy=False,small=False,key=None,annotation_key=None,model_root=None):
+def native(manifest,output,*,legacy=False,small=False,key=None,annotation_key=None,model_root=None,require_pilot_review=False):
     from middleware.file_validator import detect_document_kind
     from services.ocr.configuration import OCRConfiguration
     from services.ocr.errors import DocumentProcessingError
@@ -132,6 +131,9 @@ def native(manifest,output,*,legacy=False,small=False,key=None,annotation_key=No
     from services.ocr.resources import available_memory_bytes,cgroup_memory
     from services.ocr.worker import LocalDocumentWorker
     inputs=documents(manifest,legacy=legacy,key=annotation_key)
+    if require_pilot_review:
+        from .pilot import review_gaps
+        if legacy or any(review_gaps(item) for item in inputs):raise ValueError('Formal pilot requires complete independent human review for every sample.')
     if key:
         from .vault import key_bytes
         from cryptography.fernet import Fernet
@@ -189,14 +191,14 @@ def native(manifest,output,*,legacy=False,small=False,key=None,annotation_key=No
 
 def main():
     parser=argparse.ArgumentParser();sub=parser.add_subparsers(dest='action',required=True)
-    init=sub.add_parser('init');init.add_argument('inputs',nargs='+',type=Path);init.add_argument('--authorized',action='store_true');init.add_argument('--provenance',choices=['real_private','anonymized_real'],default='real_private');init.add_argument('--output',type=Path,required=True);init.add_argument('--key-file',type=Path)
+    init=sub.add_parser('init');init.add_argument('inputs',nargs='+',type=Path);init.add_argument('--authorized',action='store_true');init.add_argument('--provenance',choices=['real_private','anonymized_real','public_sample_form'],default='real_private');init.add_argument('--output',type=Path,required=True);init.add_argument('--key-file',type=Path)
     keygen=sub.add_parser('keygen');keygen.add_argument('--output',type=Path,required=True)
     for action in ['encrypt','decrypt']:
         command=sub.add_parser(action);command.add_argument('--input',type=Path,required=True);command.add_argument('--output',type=Path,required=True);command.add_argument('--key-file',type=Path,required=True)
     for action in ['run','replay']:
         command=sub.add_parser(action);command.add_argument('--manifest',type=Path,required=True);command.add_argument('--output',type=Path,required=True);command.add_argument('--legacy-known-facts',action='store_true');command.add_argument('--annotation-key-file',type=Path)
         command.add_argument('--key-file',type=Path)
-        if action=='run':command.add_argument('--small-synthetic',action='store_true');command.add_argument('--model-root',type=Path)
+        if action=='run':command.add_argument('--small-synthetic',action='store_true');command.add_argument('--model-root',type=Path);command.add_argument('--require-pilot-review',action='store_true')
         else:command.add_argument('--archive',type=Path,required=True)
     args=parser.parse_args();os.umask(0o077)
     if args.action=='init':initialize(args.inputs,args.output,provenance=args.provenance,authorized=args.authorized,key=args.key_file);print('Private unreviewed annotation dataset created; no facts were inferred.');return
@@ -210,7 +212,7 @@ def main():
     output=private_path(args.output)
     if output.exists():raise FileExistsError('Use a new output directory; prior results are never overwritten.')
     output.mkdir(parents=True,mode=0o700)
-    result=native(args.manifest,output,legacy=args.legacy_known_facts,small=args.small_synthetic,key=args.key_file,annotation_key=args.annotation_key_file,model_root=args.model_root) if args.action=='run' else replay(args.manifest,args.archive,legacy=args.legacy_known_facts,annotation_key=args.annotation_key_file,output=output,key=args.key_file)
+    result=native(args.manifest,output,legacy=args.legacy_known_facts,small=args.small_synthetic,key=args.key_file,annotation_key=args.annotation_key_file,model_root=args.model_root,require_pilot_review=args.require_pilot_review) if args.action=='run' else replay(args.manifest,args.archive,legacy=args.legacy_known_facts,annotation_key=args.annotation_key_file,output=output,key=args.key_file)
     save_json(output/'metrics.json',result)
     print(json.dumps({'mode':result['mode'],'samples':len(result['rows']),'outcomes':dict(Counter(r['outcome'] for r in result['rows']))}))
 

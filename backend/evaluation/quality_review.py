@@ -9,7 +9,7 @@ def template(metrics,predictions,key):
     reviews=[]
     for row in metrics['rows']:
         if row['outcome']!='ok':continue
-        if not re.fullmatch(r'[RS]\d{3}',row['id']):raise ValueError('Use anonymous sample IDs.')
+        if not re.fullmatch(r'[RSP]\d{3}',row['id']):raise ValueError('Use anonymous sample IDs.')
         prediction=read_json(private_path(predictions)/(row['id']+'.result.fernet'),key)
         reviews.append({'id':row['id'],'predictionSha256':digest(prediction),
             'groundTruthSha256':row['groundTruthSha256'],'reviewed':False,'reviewerKind':None,'errors':[]})
@@ -22,7 +22,7 @@ def apply(metrics,predictions,key,reviews):
     result=deepcopy(metrics);rows={row['id']:row for row in result['rows']};seen=set()
     for review in reviews['reviews']:
         identifier=review['id']
-        if not isinstance(identifier,str) or not re.fullmatch(r'[RS]\d{3}',identifier) or identifier in seen or identifier not in rows:raise ValueError('Invalid or duplicated sample identity.')
+        if not isinstance(identifier,str) or not re.fullmatch(r'[RSP]\d{3}',identifier) or identifier in seen or identifier not in rows:raise ValueError('Invalid or duplicated sample identity.')
         seen.add(identifier);row=rows[identifier]
         prediction=read_json(private_path(predictions)/(identifier+'.result.fernet'),key)
         if review['predictionSha256']!=digest(prediction) or review['groundTruthSha256']!=row['groundTruthSha256']:raise ValueError('Prediction or ground truth changed; repeat the review.')
