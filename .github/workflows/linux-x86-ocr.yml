@@ -1,0 +1,110 @@
+name: Linux x86_64 PaddleOCR Verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-x86-ocr-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    # Standard public-repository runner only; never a larger/self-hosted/GPU runner.
+    if: github.event_name == 'workflow_dispatch' && github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}/backend:${{ github.workspace }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONUNBUFFERED: '1'
+      PIP_CONFIG_FILE: /dev/null
+      PIP_INDEX_URL: https://pypi.org/simple
+      PIP_NO_CACHE_DIR: '1'
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: 'True'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+    defaults:
+      run:
+        shell: bash --noprofile --norc -eo pipefail {0}
+    steps:
+      - name: Check out the selected commit without persisted credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+
+      - name: Set up Python 3.12 without a dependency cache
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Report and guard the real Linux environment before heavy downloads
+        run: |
+          CI_STATE="$RUNNER_TEMP/jxtw-linux-ocr-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          echo "CI_STATE=$CI_STATE" >> "$GITHUB_ENV"
+          python ci/linux_ocr.py preflight --state "$CI_STATE"
+          mkdir -m 700 "$CI_STATE/cache" "$CI_STATE/tmp"
+          echo "HF_HOME=$CI_STATE/cache/huggingface" >> "$GITHUB_ENV"
+          echo "XDG_CACHE_HOME=$CI_STATE/cache" >> "$GITHUB_ENV"
+          echo "PADDLE_PDX_CACHE_HOME=$CI_STATE/cache/paddlex" >> "$GITHUB_ENV"
+          echo "TMPDIR=$CI_STATE/tmp" >> "$GITHUB_ENV"
+
+      - name: Install Japanese fonts and CPU shared libraries
+        timeout-minutes: 3
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk libgl1 libglib2.0-0t64 libgomp1
+          sudo apt-get clean
+
+      - name: Resolve wheels only, inspect compatibility, then install exact inspected hashes
+        run: |
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label resolve --timeout 600 -- \
+            python -m pip install --dry-run --ignore-installed --only-binary=:all: \
+            --report "$CI_STATE/pip-plan.json" -r backend/requirements-dev.txt
+          python ci/linux_ocr.py plan --state "$CI_STATE"
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label install --timeout 600 -- \
+            python -m pip install --no-deps --require-hashes --only-binary=:all: -r "$CI_STATE/resolved.txt"
+          python -m pip check
+          python ci/linux_ocr.py versions --state "$CI_STATE"
+
+      - name: Verify native Paddle CPU and PaddleOCR imports under the existing worker guard
+        run: |
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label import --timeout 150 -- \
+            python -m staging_tools.verify_linux_ocr import --state "$CI_STATE"
+
+      - name: Run synthetic backend and extraction/security regressions
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings_development
+          DJANGO_DB_PATH: ${{ runner.temp }}/jxtw-linux-ocr-${{ github.run_id }}-${{ github.run_attempt }}/regression.sqlite3
+        run: |
+          python -m unittest ci.test_linux_ocr
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label regressions --timeout 240 -- \
+            python backend/manage.py test tests --verbosity 0 --noinput
+
+      - name: Download only the two official Medium models into disposable runner state
+        run: |
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label models --timeout 300 -- \
+            python backend/download_ocr_models.py --size medium --root "$CI_STATE/models"
+
+      - name: Real cold request and two warm requests, with no model download during inference
+        env:
+          HF_HUB_OFFLINE: '1'
+        run: |
+          python ci/linux_ocr.py guard --state "$CI_STATE" --label inference --timeout 390 -- \
+            python -m staging_tools.verify_linux_ocr inference --state "$CI_STATE"
+
+      - name: Remove disposable models, caches and unpublished native/test logs
+        if: always()
+        run: python ci/linux_ocr.py cleanup --state "$CI_STATE"
+
+      - name: Publish only the allowlisted numeric and status report
+        if: always()
+        run: python ci/linux_ocr.py summary --state "$CI_STATE"
