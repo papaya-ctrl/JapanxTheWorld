@@ -32,6 +32,7 @@ jobs:
     defaults:
       run:
         shell: bash --noprofile --norc -eo pipefail {0}
+        working-directory: ${{ github.workspace }}
     steps:
       - name: Check out the selected commit without persisted credentials
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -45,6 +46,32 @@ jobs:
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+
+      - name: Verify checkout includes all verification entry points
+        run: |
+          python - <<'PY'
+          from importlib.util import find_spec
+          from pathlib import Path
+          required = (
+              'ci/__init__.py', 'ci/linux_ocr.py', 'ci/test_linux_ocr.py',
+              'backend/staging_tools/__init__.py', 'backend/staging_tools/verify_linux_ocr.py',
+              'backend/staging_tools/fixtures.py', 'backend/download_ocr_models.py',
+              'backend/manage.py', 'backend/requirements.txt', 'backend/requirements-dev.txt',
+          )
+          missing = [name for name in required if not Path(name).is_file()]
+          if missing:
+              raise SystemExit('Incomplete verification checkout. Commit these source files together: '
+                               + ', '.join(missing))
+          for module, relative in (
+              ('ci.linux_ocr', 'ci/linux_ocr.py'),
+              ('ci.test_linux_ocr', 'ci/test_linux_ocr.py'),
+              ('staging_tools.verify_linux_ocr', 'backend/staging_tools/verify_linux_ocr.py'),
+          ):
+              spec = find_spec(module)
+              if spec is None or spec.origin is None or Path(spec.origin).resolve() != Path(relative).resolve():
+                  raise SystemExit('Incorrect module resolution: ' + module)
+          print('Verification source files and Python module paths are present.')
+          PY
 
       - name: Report and guard the real Linux environment before heavy downloads
         run: |
@@ -102,9 +129,9 @@ jobs:
             python -m staging_tools.verify_linux_ocr inference --state "$CI_STATE"
 
       - name: Remove disposable models, caches and unpublished native/test logs
-        if: always()
+        if: always() && env.CI_STATE != ''
         run: python ci/linux_ocr.py cleanup --state "$CI_STATE"
 
       - name: Publish only the allowlisted numeric and status report
-        if: always()
+        if: always() && env.CI_STATE != ''
         run: python ci/linux_ocr.py summary --state "$CI_STATE"

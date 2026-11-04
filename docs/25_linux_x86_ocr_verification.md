@@ -1,8 +1,90 @@
 # Step 15: free Linux x86_64 PaddleOCR verification
 
-Prepared 31 October 2026. **Workflow prepared and locally validated; GitHub workflow
-NOT EXECUTED. Linux native OCR import/inference and performance remain unverified.**
-Nothing was committed, pushed, dispatched, deployed or purchased in this step.
+## 4 November 2026: missing-checkout repair
+
+The user reports that the first GitHub run failed because `ci/linux_ocr.py` was
+absent. Local HEAD is now `7cfc95d`; inspection of that commit confirms it added
+only the workflow and this report. The CI helper/test scripts and the native
+verifier exist in the working tree but were **never included in that commit**.
+No `.gitignore`, repository exclude or configured global ignore rule prevents
+tracking those source files. `git check-ignore -v --non-matching` prints `::` for
+each repair path (exit 1 means none are ignored); no `git add -f` is needed.
+
+The existing verifier is **`backend/staging_tools/verify_linux_ocr.py`**, with real
+`import` and `inference` commands. There is no reason to create another verifier
+at repository-root `staging_tools/`. From the repository root, the correct calls
+remain `python -m staging_tools.verify_linux_ocr import --state ...` and
+`python -m staging_tools.verify_linux_ocr inference --state ...`, with
+`PYTHONPATH=backend:.`. The workflow already provided both source roots and now
+explicitly sets its working directory to the checkout root.
+
+The repair adds an initial standard-library-only checkout check before heavy
+installation, verifying all script paths and the actual origins of both CI modules
+and the backend verifier. A regular `ci/__init__.py` prevents an installed package
+named `ci` from taking precedence. Wrong-platform CLI rejection now writes an
+explicit failed gate before starting a worker. The existing real worker, synthetic
+fixture validation, 5 GiB RSS guard, CPU model configuration, privacy controls and
+manual-only trigger are retained.
+Cleanup/summary steps run only after a CI state path has been initialized, so a
+missing-file bootstrap error is not followed by unrelated empty-state errors.
+
+Local validation on macOS ARM64 / Python 3.12.13:
+
+| Check | Observed result |
+| --- | --- |
+| Actionlint 1.7.12 | Passed |
+| Focused CI tests | 18 passed |
+| Full available backend suite | 199 passed, isolated test databases |
+| `pip check` | No broken requirements found |
+| Both native verifier commands' `--help`, CI helper CLI | Passed |
+| Clean source copy without site packages (`python -S`) | Correct module origins; no OCR/Django import required by checkout check |
+| Missing CI helper, test helper, or native verifier | Each rejected with the exact missing path |
+| Wrong-platform commands | Both return failure and write `LINUX_X86_64_REQUIRED`; no worker started |
+| Simulated worker memory error | Failure code retained, worker closed, 5 GiB limit verified |
+| Marked/unmarked cleanup, timeout, disk and private-output guards | Focused regression tests passed |
+| Git staging dry run / ignore checks | Repair sources are trackable; no forced add required |
+| Native Linux OCR or a new GitHub workflow run | **Not executed during this repair** |
+
+The model-dependent imports and inference still occur only after installation of
+the existing pinned main/dev requirements. PyYAML, used to inspect the workflow in
+the focused tests, is already required by the pinned PaddleX/PaddleOCR dependency
+set. The clean-checkout guard itself uses only the standard library. No dependencies,
+OCR settings, verified extraction rules, production authentication or frontend code
+were changed by this repair. No private document was opened or uploaded.
+
+These are the **six files to stage for this repair**, from the repository root:
+
+```sh
+git add -- .github/workflows/linux-x86-ocr.yml \
+  ci/__init__.py ci/linux_ocr.py ci/test_linux_ocr.py \
+  backend/staging_tools/verify_linux_ocr.py \
+  docs/25_linux_x86_ocr_verification.md
+git diff --cached --check
+git diff --cached --name-only
+git diff --cached
+```
+
+These commands are for the user's review; this session did not stage, commit,
+push or dispatch. Do not publish only the YAML again. The helper files must be in
+the same reviewed outgoing commit set. Check unrelated existing staged changes
+before committing. Pending Step 14 edits remain separate working-tree changes and
+are not required to fix this missing-helper failure. To verify the resulting
+commit after you choose to create it:
+
+```sh
+git ls-tree -r --name-only HEAD -- ci backend/staging_tools/verify_linux_ocr.py
+```
+
+That output must include all three `ci` source files and the backend verifier.
+The original preparation notes and publication commands below are historical;
+use this repair's file list for the current fix. Linux native inference remains
+unverified until a user-triggered run reaches and passes that gate.
+
+## Original 31 October 2026 preparation record
+
+At preparation, the workflow had not been executed. Linux native OCR import,
+inference and performance were unverified. The preparation session made no commit,
+push, dispatch, deployment or purchase; the later user-reported run is recorded above.
 
 The user reports that Step 14's actual Ubuntu ARM64 authenticated non-OCR API
 checks passed. That environment intentionally cannot verify PaddleOCR. This step
